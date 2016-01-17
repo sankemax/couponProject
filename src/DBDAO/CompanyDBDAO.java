@@ -26,9 +26,7 @@ public class CompanyDBDAO implements CompanyDAO {
 		Connection connection = connectionPool.getConnection();
 		
 		try {
-			
-			connection.setAutoCommit(false);
-			
+						
 			String sql = "INSERT INTO company(comp_name, password, email) VALUES(?, ?, ?)";
 			
 			PreparedStatement preparedSt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
@@ -38,17 +36,17 @@ public class CompanyDBDAO implements CompanyDAO {
 			preparedSt.executeUpdate();
 			
 			connection.commit();
+			ResultSet generatedKeys = preparedSt.getGeneratedKeys();
+			if (generatedKeys.next()) {
+				
+				company.setCompanyId(generatedKeys.getLong(1));
+			} else {
+				// TODO throw exception?
+			}
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-			try {
-				connection.rollback();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
+			e.printStackTrace();			
 		} finally {
 			connectionPool.returnConnection(connection);
 		}
@@ -139,9 +137,7 @@ public class CompanyDBDAO implements CompanyDAO {
 		Connection connection = connectionPool.getConnection();
 		
 		try {
-			
-			connection.setAutoCommit(false);
-			
+						
 			String sql = "UPDATE company SET comp_name = ?, password = ?, email = ? WHERE id = ?";
 			
 			PreparedStatement preparedSt = connection.prepareStatement(sql);
@@ -150,18 +146,10 @@ public class CompanyDBDAO implements CompanyDAO {
 			preparedSt.setString(3, company.getEmail());
 			preparedSt.setLong(4, company.getId());
 			preparedSt.executeUpdate();
-			
-			connection.commit();
-		
+					
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			try {
-				connection.rollback();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			
 		} finally {
 			connectionPool.returnConnection(connection);
