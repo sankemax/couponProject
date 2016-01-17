@@ -110,7 +110,8 @@ public class CustomerDBDAO implements CustomerDAO {
 			rs = st.executeQuery(sql);
 			
 			if(rs.next()){
-				customer = new Customer(rs.getLong(1), rs.getString(2), rs.getString(3));
+				customer = new Customer(rs.getString(2), rs.getString(3));
+				customer.setId(rs.getLong(1));
 			}else{
 				// TODO æøé÷ú ùâéàä: ú.æ. ìà ÷ééí áîòøëú
 			}
@@ -137,7 +138,9 @@ public class CustomerDBDAO implements CustomerDAO {
 			rs = st.executeQuery(sql);
 			
 			while(rs.next()){
-				customers.add(new Customer(rs.getLong(1), rs.getString(2), rs.getString(3)));
+				Customer customer = new Customer(rs.getString(2), rs.getString(3));
+				customer.setId(rs.getLong(1));
+				customers.add(customer);
 			}
 			
 		} catch (SQLException e) {
@@ -164,7 +167,8 @@ public class CustomerDBDAO implements CustomerDAO {
 			rs = st.executeQuery(sql);
 			
 			if(rs.next()){
-				customer = new Customer(rs.getLong(1), rs.getString(2), rs.getString(3));
+				customer = new Customer(rs.getString(2), rs.getString(3));
+				customer.setId(rs.getLong(1));
 			}else{
 				// TODO æøé÷ú ùâéàä: ùí ìà ÷ééí áîòøëú
 			}
