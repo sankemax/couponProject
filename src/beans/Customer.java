@@ -38,6 +38,10 @@ public class Customer {
 	public String toString() {
 		return "Customer [id=" + customerId + ", custName=" + custName + ", password=" + password + "]";
 	}
+
+	public void setId(long customerId) {
+		this.customerId = customerId;
+	}
 	
 	
 }
