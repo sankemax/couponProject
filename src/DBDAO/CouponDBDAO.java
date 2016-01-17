@@ -127,8 +127,6 @@ public class CouponDBDAO implements CouponDAO {
 		
 		try {
 			
-			connection.setAutoCommit(false);
-			
 			String sql = "UPDATE coupon SET title = ?, start_date = ?, end_date = ?, amount = ?, coupon_type = ?, message = ?, price = ?, image = ? WHERE id = ?";
 			
 			PreparedStatement preparedSt = connection.prepareStatement(sql);
@@ -143,17 +141,9 @@ public class CouponDBDAO implements CouponDAO {
 			preparedSt.setLong(9, coupon.getId());
 			preparedSt.executeUpdate();
 			
-			connection.commit();
-		
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			try {
-				connection.rollback();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
 			
 		} finally {
 			connectionPool.returnConnection(connection);
