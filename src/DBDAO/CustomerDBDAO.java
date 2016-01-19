@@ -14,14 +14,18 @@ import connections.ConnectionPool;
 public class CustomerDBDAO implements CustomerDAO {
 	
 	ConnectionPool pool = ConnectionPool.getInstance();
+	
 	@Override
 	public void createCustomer(Customer customer) {
-		Connection connection = pool.getConnection();
 		
-		PreparedStatement ps;
-		ResultSet rs;
-			try {
-				String sql = "INSERT INTO Customer (CUST_NAME, PASSWORD) VALUES(?,?)";
+		Connection connection = pool.getConnection();
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		String sql = null;
+		
+		try {
+				
+				sql = "INSERT INTO Customer (CUST_NAME, PASSWORD) VALUES(?,?)";
 				ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, customer.getCustName());
 				ps.setString(2, customer.getPassword());
@@ -31,12 +35,12 @@ public class CustomerDBDAO implements CustomerDAO {
 				rs.next();
 				customer.setId(rs.getLong(1));
 				
-			} catch (SQLException e) {
+		} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}finally {
+		}finally {
 				pool.returnConnection(connection);
-			}
+		}
 	}
 
 	@Override
@@ -65,13 +69,19 @@ public class CustomerDBDAO implements CustomerDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
+			
+			try {
+				connection.setAutoCommit(true);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			pool.returnConnection(connection);
 		}
 	}
 
 	@Override
 	public void updateCustomer(Customer customer) {
-		
 		
 		Connection connection = pool.getConnection();
 		
@@ -264,6 +274,13 @@ public class CustomerDBDAO implements CustomerDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
+			
+			try {
+				connection.setAutoCommit(true);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			pool.returnConnection(connection);
 		}
 	}

@@ -24,19 +24,22 @@ public class CompanyDBDAO implements CompanyDAO {
 	public void createCompany(Company company) {
 
 		Connection connection = connectionPool.getConnection();
+		PreparedStatement preparedSt = null;
+		ResultSet generatedKeys = null;
+		String sql = null;
 		
 		try {
 						
-			String sql = "INSERT INTO company(comp_name, password, email) VALUES(?, ?, ?)";
+			sql = "INSERT INTO company(comp_name, password, email) VALUES(?, ?, ?)";
 			
-			PreparedStatement preparedSt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			preparedSt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			preparedSt.setString(1, company.getCompName());
 			preparedSt.setString(2, company.getPassword());
 			preparedSt.setString(3, company.getEmail());
 			preparedSt.executeUpdate();
-			
+
 			connection.commit();
-			ResultSet generatedKeys = preparedSt.getGeneratedKeys();
+			generatedKeys = preparedSt.getGeneratedKeys();
 			if (generatedKeys.next()) {
 				
 				company.setCompanyId(generatedKeys.getLong(1));
@@ -48,6 +51,14 @@ public class CompanyDBDAO implements CompanyDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();			
 		} finally {
+			
+			try {
+				if (preparedSt != null) preparedSt.close();
+				if (generatedKeys != null) generatedKeys.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			connectionPool.returnConnection(connection);
 		}
 	}
@@ -56,18 +67,29 @@ public class CompanyDBDAO implements CompanyDAO {
 	public boolean isNameExists(String companyName) {
 		
 		Connection connection = connectionPool.getConnection();
-		String sql = "SELECT company.comp_name FROM company WHERE company.comp_name = '" + companyName + "' FETCH FIRST ROW ONLY";
+		Statement statement = null;
+		ResultSet result = null;
+		String sql = null;
 		
 		try {
 			
-			Statement statement = connection.createStatement();
-			ResultSet result = statement.executeQuery(sql);
+			sql = "SELECT company.comp_name FROM company WHERE company.comp_name = '" + companyName + "' FETCH FIRST ROW ONLY";
+			statement = connection.createStatement();
+			result = statement.executeQuery(sql);
 			if (result.next()) return true;
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
+			
+			try {
+				if (statement != null) statement.close();
+				if (result != null) result.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			connectionPool.returnConnection(connection);
 		}
 		
@@ -78,6 +100,8 @@ public class CompanyDBDAO implements CompanyDAO {
 	public void removeCompany(Company company) {
 
 		Connection connection = connectionPool.getConnection();
+		String sql = null;
+		PreparedStatement preparedSt = null;
 		
 		try {
 			
@@ -86,8 +110,6 @@ public class CompanyDBDAO implements CompanyDAO {
 			List<Coupon> couponsOwnedByCompany = couponDAO.getAllCouponsCompany(companyId);
 			
 			connection.setAutoCommit(false);
-			String sql;
-			PreparedStatement preparedSt;
 			
 			for (Coupon coupon : couponsOwnedByCompany) {
 				
@@ -97,18 +119,21 @@ public class CompanyDBDAO implements CompanyDAO {
 				
 				preparedSt.setLong(1, couponId);
 				preparedSt.executeQuery();
+				preparedSt.close();
 				
 				sql = "DELETE FROM company_coupon WHERE coupon_id = ?";
 				preparedSt = connection.prepareStatement(sql);
 				
 				preparedSt.setLong(1, couponId);
 				preparedSt.executeQuery();
+				preparedSt.close();
 				
 				sql = "DELETE FROM coupon WHERE id = ?";
 				preparedSt = connection.prepareStatement(sql);
 				
 				preparedSt.setLong(1, couponId);
 				preparedSt.executeQuery();
+				preparedSt.close();
 			}
 			
 			sql = "DELETE FROM company WHERE id = ?";
@@ -128,6 +153,16 @@ public class CompanyDBDAO implements CompanyDAO {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
+		} finally {
+			
+			try {
+				if (preparedSt != null) preparedSt.close();
+				connection.setAutoCommit(true);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			connectionPool.returnConnection(connection);
 		}
 	}
 
@@ -135,12 +170,14 @@ public class CompanyDBDAO implements CompanyDAO {
 	public void updateCompany(Company company) {
 
 		Connection connection = connectionPool.getConnection();
+		PreparedStatement preparedSt = null;
+		String sql = null;
 		
 		try {
 						
-			String sql = "UPDATE company SET comp_name = ?, password = ?, email = ? WHERE id = ?";
+			sql = "UPDATE company SET comp_name = ?, password = ?, email = ? WHERE id = ?";
 			
-			PreparedStatement preparedSt = connection.prepareStatement(sql);
+			preparedSt = connection.prepareStatement(sql);
 			preparedSt.setString(1, company.getCompName());
 			preparedSt.setString(2, company.getPassword());
 			preparedSt.setString(3, company.getEmail());
@@ -152,6 +189,13 @@ public class CompanyDBDAO implements CompanyDAO {
 			e.printStackTrace();
 			
 		} finally {
+			
+			try {
+				if (preparedSt != null) preparedSt.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			connectionPool.returnConnection(connection);
 		}
 	}
@@ -160,17 +204,20 @@ public class CompanyDBDAO implements CompanyDAO {
 	public Company getCompany(long id) {
 		
 		Connection connection = connectionPool.getConnection();
-		String sql = "SELECT * FROM company WHERE company.id = '" + id + "' FETCH FIRST ROW ONLY";
+		ResultSet result = null;
+		Statement statement = null; 
+		String sql = null;
+		Company company = null;
 		
 		try {
 			
-			Statement statement = connection.createStatement();
-			ResultSet result = statement.executeQuery(sql);
+			sql = "SELECT * FROM company WHERE company.id = '" + id + "' FETCH FIRST ROW ONLY";
+			statement = connection.createStatement();
+			result = statement.executeQuery(sql);
 			if (result.next()) {
 				
-				Company company = new Company(result.getString(2), result.getString(3), result.getString(4));
+				company = new Company(result.getString(2), result.getString(3), result.getString(4));
 				company.setCompanyId(result.getLong(1));
-				return company;
 			} else {
 				// TODO throw ecxeption
 			}
@@ -179,22 +226,32 @@ public class CompanyDBDAO implements CompanyDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
+			
+			try {
+				if (statement != null) statement.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			connectionPool.returnConnection(connection);
 		}
-		return null;
+		return company;
 	}
 
 	@Override
 	public List<Company> getAllCompanies() {
 		
 		Connection connection = connectionPool.getConnection();
-		String sql = "SELECT * FROM company";
+		Statement statement = null;
+		ResultSet resultSet = null;
+		String sql = null;
 		List<Company> companyList = new ArrayList<>();
 		
 		try {
 			
-			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery(sql);
+			sql = "SELECT * FROM company";
+			statement = connection.createStatement();
+			resultSet = statement.executeQuery(sql);
 			while (resultSet.next()) {
 				
 				Company company = new Company(resultSet.getString(2), resultSet.getString(3), resultSet.getString(4));
@@ -206,6 +263,13 @@ public class CompanyDBDAO implements CompanyDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
+			
+			try {
+				if (statement != null) statement.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			connectionPool.returnConnection(connection);
 		}
 		return companyList;
@@ -215,21 +279,31 @@ public class CompanyDBDAO implements CompanyDAO {
 	public boolean login(String compName, String password) {
 		
 		Connection connection = connectionPool.getConnection();
-		String sql = "SELECT company.id FROM company WHERE company.comp_name = ? AND company.password = ? FETCH FIRST ROW ONLY";
+		PreparedStatement preparedStatement = null;
+		ResultSet result = null;
+		String sql = null;
 		
 		try {
 			
-			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			sql = "SELECT company.id FROM company WHERE company.comp_name = ? AND company.password = ? FETCH FIRST ROW ONLY";
+			preparedStatement = connection.prepareStatement(sql);
 			preparedStatement.setString(1, compName);
 			preparedStatement.setString(2, password);
 			
-			ResultSet result = preparedStatement.executeQuery();
+			result = preparedStatement.executeQuery();
 			if (result.next()) return true;
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
+			
+			try {
+				if (preparedStatement != null) preparedStatement.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			connectionPool.returnConnection(connection);
 		}
 		return false;
@@ -239,13 +313,16 @@ public class CompanyDBDAO implements CompanyDAO {
 	public Company getCompanyByName(String name) {
 		
 		Connection connection = connectionPool.getConnection();
+		Statement statement = null;
+		ResultSet result = null;
+		String sql = null;
 		Company company = new Company();
 		
 		try {
 			
-			String sql = "SELECT * FROM company WHERE COMP_NAME = '" + name + "'";
-			Statement statement = connection.createStatement();
-			ResultSet result = statement.executeQuery(sql);
+			sql = "SELECT * FROM company WHERE COMP_NAME = '" + name + "'";
+			statement = connection.createStatement();
+			result = statement.executeQuery(sql);
 			
 			if (result.next()) {
 				
@@ -261,6 +338,13 @@ public class CompanyDBDAO implements CompanyDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
+			
+			try {
+				if (statement != null) statement.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			connectionPool.returnConnection(connection);
 		}
 		
