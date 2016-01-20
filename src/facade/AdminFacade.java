@@ -79,7 +79,7 @@ public class AdminFacade implements CouponClientFacade{
 	}
 	
 	@Override
-	public CouponClientFacade login(String name, String password, String clientType) {
+	public CouponClientFacade login(String name, String password) {
 		if(name.equals("admin")){
 			// TODO Auto-generated catch block
 		}
