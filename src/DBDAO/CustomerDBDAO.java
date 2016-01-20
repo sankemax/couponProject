@@ -14,19 +14,15 @@ import connections.ConnectionPool;
 public class CustomerDBDAO implements CustomerDAO {
 	
 	ConnectionPool pool = ConnectionPool.getInstance();
-	
 	@Override
 	public void createCustomer(Customer customer) {
 		
 		Connection connection = pool.getConnection();
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		String sql = null;
+		String sql = "INSERT INTO Customer (CUST_NAME, PASSWORD) VALUES(?,?)";
 		
-		try {
+		ResultSet rs;
+			try(PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
 				
-				sql = "INSERT INTO Customer (CUST_NAME, PASSWORD) VALUES(?,?)";
-				ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 				ps.setString(1, customer.getCustName());
 				ps.setString(2, customer.getPassword());
 				ps.execute();
@@ -34,27 +30,27 @@ public class CustomerDBDAO implements CustomerDAO {
 				rs = ps.getGeneratedKeys();
 				rs.next();
 				customer.setId(rs.getLong(1));
-				
-		} catch (SQLException e) {
+				rs.close();
+			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-		}finally {
+			}finally {
 				pool.returnConnection(connection);
-		}
+			}
 	}
 
 	@Override
 	public void removeCustomer(Customer customer) {
-	Connection connection = pool.getConnection();
 		
-		Statement st;
+		Connection connection = pool.getConnection();
+		String sql1 = "DELETE FROM Customer_Coupon  WHERE CUST_ID =" + customer.getId();
+		String sql2 = "DELETE FROM Customer  WHERE ID =" + customer.getId();
 		
-		try {
+		
+		try(Statement st = connection.createStatement();){
 			
 			connection.setAutoCommit(false);
-			String sql1 = "DELETE FROM Customer_Coupon  WHERE CUST_ID =" + customer.getId();
-			String sql2 = "DELETE FROM Customer  WHERE ID =" + customer.getId();
-			st = connection.createStatement();
+			
 			st.execute(sql1);
 			st.execute(sql2);
 			connection.commit();
@@ -69,13 +65,6 @@ public class CustomerDBDAO implements CustomerDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
-			
-			try {
-				connection.setAutoCommit(true);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			pool.returnConnection(connection);
 		}
 	}
@@ -83,18 +72,17 @@ public class CustomerDBDAO implements CustomerDAO {
 	@Override
 	public void updateCustomer(Customer customer) {
 		
+		
 		Connection connection = pool.getConnection();
+		String sql = "UPDATE Customer SET PASSWORD = ? WHERE ID = ? ";
 		
-		PreparedStatement ps;
 		
-		try {
-			String sql = "UPDATE Customer SET PASSWORD = ? WHERE ID = ?";
-			ps = connection.prepareStatement(sql);
+		try(PreparedStatement ps = connection.prepareStatement(sql);) {
 			
 			ps.setString(1, customer.getPassword());
 			ps.setLong(2, customer.getId());
 			if(!ps.execute()){
-				//TODO Ã¦Ã¸Ã©Ã·Ãº Ã¹Ã¢Ã©Ã Ã¤: Ã¹Ã­ Ã¬Ã  Ã·Ã©Ã©Ã­ Ã¡Ã®Ã²Ã¸Ã«Ãº
+				//TODO æøé÷ú ùâéàä: ùí ìà ÷ééí áîòøëú
 			}
 			
 		} catch (SQLException e) {
@@ -109,22 +97,21 @@ public class CustomerDBDAO implements CustomerDAO {
 	public Customer getCustomer(long id) {
 		
 		Connection connection = pool.getConnection();
+		String sql = "SELECT * FROM Customer WHERE ID = " + id + "FETCH FIRST ROW ONLY";
 		
-		Statement st;
 		ResultSet rs;
 		Customer customer = null ;
 		
-		try {
-			st = connection.createStatement();
-			String sql = "SELECT * FROM Customer WHERE ID = " + id;
+		try(Statement st = connection.createStatement();) {
+			
 			rs = st.executeQuery(sql);
 			
 			if(rs.next()){
-				customer = new Customer(rs.getString(2), rs.getString(3));
-				customer.setId(rs.getLong(1));
+				customer = new Customer(rs.getLong(1), rs.getString(2), rs.getString(3));
 			}else{
-				// TODO Ã¦Ã¸Ã©Ã·Ãº Ã¹Ã¢Ã©Ã Ã¤: Ãº.Ã¦. Ã¬Ã  Ã·Ã©Ã©Ã­ Ã¡Ã®Ã²Ã¸Ã«Ãº
+				// TODO æøé÷ú ùâéàä: ú.æ. ìà ÷ééí áîòøëú
 			}
+			rs.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -137,22 +124,19 @@ public class CustomerDBDAO implements CustomerDAO {
 	@Override
 	public List<Customer> getAllCustomer() {
 		Connection connection = pool.getConnection();
+		String sql = "SELECT * FROM Customer";
 		
-		Statement st;
 		ResultSet rs;
 		List<Customer> customers = new ArrayList<>();
 		
-		try {
-			st = connection.createStatement();
-			String sql = "SELECT * FROM Customer";
+		try(Statement st = connection.createStatement();) {
+			
 			rs = st.executeQuery(sql);
 			
 			while(rs.next()){
-				Customer customer = new Customer(rs.getString(2), rs.getString(3));
-				customer.setId(rs.getLong(1));
-				customers.add(customer);
+				customers.add(new Customer(rs.getLong(1), rs.getString(2), rs.getString(3)));
 			}
-			
+			rs.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -166,22 +150,21 @@ public class CustomerDBDAO implements CustomerDAO {
 	public Customer getCustomerByName(String name) {
 		
 		Connection connection = pool.getConnection();
+		String sql = "SELECT * FROM Customer WHERE CUST_NAME = '" + name + "'FETCH FIRST ROW ONLY";
 		
-		Statement st;
 		ResultSet rs;
 		Customer customer = null ;
 		
-		try {
-			st = connection.createStatement();
-			String sql = "SELECT * FROM Customer WHERE CUST_NAME = '" + name + "'";
+		try(Statement st = connection.createStatement();){
+			
 			rs = st.executeQuery(sql);
 			
 			if(rs.next()){
-				customer = new Customer(rs.getString(2), rs.getString(3));
-				customer.setId(rs.getLong(1));
+				customer = new Customer(rs.getLong(1), rs.getString(2), rs.getString(3));
 			}else{
-				// TODO Ã¦Ã¸Ã©Ã·Ãº Ã¹Ã¢Ã©Ã Ã¤: Ã¹Ã­ Ã¬Ã  Ã·Ã©Ã©Ã­ Ã¡Ã®Ã²Ã¸Ã«Ãº
+				// TODO æøé÷ú ùâéàä: ùí ìà ÷ééí áîòøëú
 			}
+			rs.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -194,18 +177,18 @@ public class CustomerDBDAO implements CustomerDAO {
 	@Override
 	public boolean isNameExists(Customer customer) {
 		Connection connection = pool.getConnection();
+		String sql = "SELECT * FROM Customer WHERE CUST_NAME = '" +customer.getCustName()+ "'FETCH FIRST ROW ONLY";
 		
-		Statement st;
 		ResultSet rs;
 		
-		try {
-			st = connection.createStatement();
-			String sql = "SELECT * FROM Customer WHERE CUST_NAME = '" +customer.getCustName()+"'";
+		try(Statement st = connection.createStatement();){
+			
 			rs = st.executeQuery(sql);
 			
 			if(rs.next()){
 				return true;
 			}
+			rs.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -219,12 +202,11 @@ public class CustomerDBDAO implements CustomerDAO {
 	public boolean IsPurchased(long customerId, long couponId) {
 		
 		Connection connection = pool.getConnection();
-		PreparedStatement ps;
+		String sql = "SELECT * FROM Customer_Coupon WHERE CUST_ID = ? AND COUPON_ID = ? FETCH FIRST ROW ONLY";
 		ResultSet rs;
 			
-		try {
-			String sql = "SELECT * FROM Customer_Coupon WHERE CUST_ID = ? AND COUPON_ID = ?";
-			ps = connection.prepareStatement(sql);
+		try(PreparedStatement ps = connection.prepareStatement(sql);){
+			
 			ps.setLong(1, customerId);
 			ps.setLong(2, couponId);
 			rs = ps.executeQuery();
@@ -232,6 +214,8 @@ public class CustomerDBDAO implements CustomerDAO {
 			if(rs.next()){
 				return true;
 			}
+			rs.close();
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -245,19 +229,17 @@ public class CustomerDBDAO implements CustomerDAO {
 	public void purchaseCoupon(long customerId, long couponId) {
 		Connection connection = pool.getConnection();
 		
-		PreparedStatement ps;
-		Statement st;
+		String sql1 = "INSERT INTO Customer_Coupon (CUST_ID, COUPON_ID) VALUES(?,?)";
+		String sql2 = "UPDATE Coupon SET AMOUNT = AMOUNT - 1 WHERE ID = " + couponId;
 		
-		try {
+		
+		try (PreparedStatement ps = connection.prepareStatement(sql1); Statement st = connection.createStatement()){
 			connection.setAutoCommit(false);
-			String sql1 = "INSERT INTO Customer_Coupon (CUST_ID, COUPON_ID) VALUES(?,?)";
-			ps = connection.prepareStatement(sql1);
+			
 			ps.setLong(1, customerId);
 			ps.setLong(2, couponId);
 			ps.execute();
 			
-			String sql2 = "UPDATE Coupon SET AMOUNT = AMOUNT - 1 WHERE ID = " + couponId;
-			st = connection.createStatement();
 			st.execute(sql2);
 			connection.commit();
 		
@@ -274,13 +256,6 @@ public class CustomerDBDAO implements CustomerDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
-			
-			try {
-				connection.setAutoCommit(true);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
 			pool.returnConnection(connection);
 		}
 	}
@@ -289,20 +264,15 @@ public class CustomerDBDAO implements CustomerDAO {
 	public boolean login(String compName, String password) {
 		Connection connection = pool.getConnection();
 		
-		Statement st;
-		ResultSet rs;
+		String sql = "SELECT * FROM Customer WHERE CUST_NAME = '" + compName + "'FETCH FIRST ROW ONLY";
 		
-		try {
-			st = connection.createStatement();
-			String sql = "SELECT * FROM Customer WHERE CUST_NAME = '" + compName + "'";
-			rs = st.executeQuery(sql);
-			
+		try (Statement st= connection.createStatement(); ResultSet rs = st.executeQuery(sql);){
 			if(!rs.next()){
-				// TODO Ã¦Ã¸Ã©Ã·Ãº Ã¹Ã¢Ã©Ã Ã¤: Ã¹Ã­ Ã®Ã¹ÃºÃ®Ã¹ Ã¬Ã  Ã·Ã©Ã©Ã­ Ã¡Ã®Ã²Ã¸Ã«Ãº
-				System.out.println("Ã¹Ã­ Ã¬Ã  Ã·Ã©Ã©Ã­");
+				// TODO æøé÷ú ùâéàä: ùí îùúîù ìà ÷ééí áîòøëú
+				System.out.println("ùí ìà ÷ééí");
 			}else if (!rs.getString(2).equals(password)){
-				// TODO Ã¦Ã¸Ã©Ã·Ãº Ã¹Ã¢Ã©Ã Ã¤: Ã¤Ã±Ã©Ã±Ã®Ã  Ã¬Ã  ÃºÃ¥Ã Ã®Ãº Ã¬Ã¹Ã­ Ã®Ã¹ÃºÃ®Ã¹
-				System.out.println("Ã±Ã©Ã±Ã®Ã  Ã¬Ã  Ã°Ã«Ã¥Ã°Ã¤");
+				// TODO æøé÷ú ùâéàä: äñéñîà ìà úåàîú ìùí îùúîù
+				System.out.println("ñéñîà ìà ðëåðä");
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
