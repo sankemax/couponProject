@@ -19,9 +19,9 @@ public class CustomerDBDAO implements CustomerDAO {
 		
 		Connection connection = pool.getConnection();
 		String sql = "INSERT INTO Customer (CUST_NAME, PASSWORD) VALUES(?,?)";
-		
 		ResultSet rs;
-			try(PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
+		
+			try(PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS); ) {
 				
 				ps.setString(1, customer.getCustName());
 				ps.setString(2, customer.getPassword());
@@ -107,7 +107,8 @@ public class CustomerDBDAO implements CustomerDAO {
 			rs = st.executeQuery(sql);
 			
 			if(rs.next()){
-				customer = new Customer(rs.getLong(1), rs.getString(2), rs.getString(3));
+				customer = new Customer(rs.getString(2), rs.getString(3));
+				customer.setId(rs.getLong(1));
 			}else{
 				// TODO זריקת שגיאה: ת.ז. לא קיים במערכת
 			}
@@ -134,7 +135,10 @@ public class CustomerDBDAO implements CustomerDAO {
 			rs = st.executeQuery(sql);
 			
 			while(rs.next()){
-				customers.add(new Customer(rs.getLong(1), rs.getString(2), rs.getString(3)));
+				Customer customer = new Customer(rs.getString(2), rs.getString(3));
+				customer.setId(rs.getLong(1));
+				customers.add(customer);
+				
 			}
 			rs.close();
 		} catch (SQLException e) {
@@ -160,7 +164,8 @@ public class CustomerDBDAO implements CustomerDAO {
 			rs = st.executeQuery(sql);
 			
 			if(rs.next()){
-				customer = new Customer(rs.getLong(1), rs.getString(2), rs.getString(3));
+				customer = new Customer(rs.getString(2), rs.getString(3));
+				customer.setId(rs.getLong(1));
 			}else{
 				// TODO זריקת שגיאה: שם לא קיים במערכת
 			}
