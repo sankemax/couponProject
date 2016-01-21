@@ -52,7 +52,7 @@ public class CustomerFacade implements CouponClientFacade {
 	}
 	
 	@Override
-	public CouponClientFacade login(String name, String password, String clientType) {
+	public CouponClientFacade login(String name, String password) {
 
 		if(!customerDAO.login(name, password)){
 			// TODO Auto-generated method stub

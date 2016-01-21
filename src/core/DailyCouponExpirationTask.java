@@ -33,8 +33,7 @@ public class DailyCouponExpirationTask implements Runnable {
 			try {
 				Thread.sleep(MILLI_SEC_IN_DAY);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				break;
 			}
 		}
 	}
