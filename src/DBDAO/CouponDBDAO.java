@@ -11,6 +11,7 @@ import DAO.CouponDAO;
 import beans.Coupon;
 import beans.CouponType;
 import connections.ConnectionPool;
+import connections.SqlUtility;
 
 public class CouponDBDAO implements CouponDAO {
 
@@ -51,7 +52,9 @@ public class CouponDBDAO implements CouponDAO {
 			
 			long generatedId = 0;
 			if (generatedInfo.next()) {
+				
 				generatedId = generatedInfo.getLong(1);
+				
 			} else {
 				// TODO some error retreiving generated ID
 			}
@@ -69,24 +72,12 @@ public class CouponDBDAO implements CouponDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			try {
-				connection.rollback();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			SqlUtility.rollbackConnection(connection);
 			
 		} finally {
 			
-			try {
-				if (preparedSt != null) preparedSt.close();
-				if (generatedInfo != null) generatedInfo.close();
-				connection.setAutoCommit(true);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+			SqlUtility.closeStatement(preparedSt);
+			SqlUtility.closeResultSet(generatedInfo);
 			connectionPool.returnConnection(connection);
 		}
 		
@@ -131,22 +122,11 @@ public class CouponDBDAO implements CouponDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			try {
-				connection.rollback();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			SqlUtility.rollbackConnection(connection);
+			
 		} finally {
 			
-			try {
-				if (preparedSt != null) preparedSt.close();
-				connection.setAutoCommit(true);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+			SqlUtility.closeStatement(preparedSt);
 			connectionPool.returnConnection(connection);
 		}
 	}
@@ -179,14 +159,7 @@ public class CouponDBDAO implements CouponDAO {
 			
 		} finally {
 			
-			try {
-				if (preparedSt != null) preparedSt.close();
-				connection.setAutoCommit(true);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
+			SqlUtility.closeStatement(preparedSt);
 			connectionPool.returnConnection(connection);
 		}
 	}
@@ -209,15 +182,11 @@ public class CouponDBDAO implements CouponDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		} finally {
 			
-				try {
-					if (statement != null) statement.close();
-					if (result != null) result.close();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			SqlUtility.closeStatement(statement);
+			SqlUtility.closeResultSet(result);
 			connectionPool.returnConnection(connection);
 		}
 		return flag;
@@ -241,6 +210,7 @@ public class CouponDBDAO implements CouponDAO {
 				
 				coupon = new Coupon(result.getString(2), result.getDate(3), result.getDate(4), result.getInt(5), CouponType.valueOf(result.getString(6)), result.getString(7), result.getDouble(8), result.getString(9));
 				coupon.setCouponId(id);
+				
 			} else {
 				// TODO throw ecxeption
 			}
@@ -248,15 +218,11 @@ public class CouponDBDAO implements CouponDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		} finally {
 			
-			try {
-				if (statement != null) statement.close();
-				if (result != null) result.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			SqlUtility.closeStatement(statement);
+			SqlUtility.closeResultSet(result);
 			connectionPool.returnConnection(connection);
 		}
 		return coupon;
@@ -285,15 +251,11 @@ public class CouponDBDAO implements CouponDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		} finally {
 			
-			try {
-				if (statement != null) statement.close();
-				if (resultSet != null) resultSet.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			SqlUtility.closeStatement(statement);
+			SqlUtility.closeResultSet(resultSet);
 			connectionPool.returnConnection(connection);
 		}
 		return couponList;
@@ -325,13 +287,8 @@ public class CouponDBDAO implements CouponDAO {
 			e.printStackTrace();
 		} finally {
 			
-			try {
-				if (preparedStatement != null) preparedStatement.close();
-				if (resultSet != null) resultSet.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			SqlUtility.closeStatement(preparedStatement);
+			SqlUtility.closeResultSet(resultSet);
 			connectionPool.returnConnection(connection);
 		}
 		return couponList;
@@ -364,13 +321,8 @@ public class CouponDBDAO implements CouponDAO {
 			e.printStackTrace();
 		} finally {
 			
-			try {
-				if (preparedStatement != null) preparedStatement.close();
-				if (resultSet != null) resultSet.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			SqlUtility.closeStatement(preparedStatement);
+			SqlUtility.closeResultSet(resultSet);
 			connectionPool.returnConnection(connection);
 		}
 		return couponList;
@@ -402,13 +354,8 @@ public class CouponDBDAO implements CouponDAO {
 			e.printStackTrace();
 		} finally {
 			
-			try {
-				if (preparedStatement != null) preparedStatement.close();
-				if (resultSet != null) resultSet.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			SqlUtility.closeStatement(preparedStatement);
+			SqlUtility.closeResultSet(resultSet);
 			connectionPool.returnConnection(connection);
 		}
 		return couponList;
@@ -441,13 +388,8 @@ public class CouponDBDAO implements CouponDAO {
 			e.printStackTrace();
 		} finally {
 			
-			try {
-				if (preparedStatement != null) preparedStatement.close();
-				if (resultSet != null) resultSet.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			SqlUtility.closeStatement(preparedStatement);
+			SqlUtility.closeResultSet(resultSet);
 			connectionPool.returnConnection(connection);
 		}
 		return couponList;

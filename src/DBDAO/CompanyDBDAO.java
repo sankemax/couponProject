@@ -12,6 +12,7 @@ import DAO.CouponDAO;
 import beans.Company;
 import beans.Coupon;
 import connections.ConnectionPool;
+import connections.SqlUtility;
 
 public class CompanyDBDAO implements CompanyDAO {
 	ConnectionPool connectionPool;
@@ -40,6 +41,7 @@ public class CompanyDBDAO implements CompanyDAO {
 
 			connection.commit();
 			generatedKeys = preparedSt.getGeneratedKeys();
+			
 			if (generatedKeys.next()) {
 				
 				company.setCompanyId(generatedKeys.getLong(1));
@@ -49,16 +51,12 @@ public class CompanyDBDAO implements CompanyDAO {
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();			
+			SqlUtility.rollbackConnection(connection);
+			
 		} finally {
 			
-			try {
-				if (preparedSt != null) preparedSt.close();
-				if (generatedKeys != null) generatedKeys.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			SqlUtility.closeStatement(preparedSt);
+			SqlUtility.closeResultSet(generatedKeys);
 			connectionPool.returnConnection(connection);
 		}
 	}
@@ -70,30 +68,27 @@ public class CompanyDBDAO implements CompanyDAO {
 		Statement statement = null;
 		ResultSet result = null;
 		String sql = null;
+		boolean flag = false;
 		
 		try {
 			
 			sql = "SELECT company.comp_name FROM company WHERE company.comp_name = '" + companyName + "' FETCH FIRST ROW ONLY";
 			statement = connection.createStatement();
 			result = statement.executeQuery(sql);
-			if (result.next()) return true;
+			if (result.next()) flag = true;
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		} finally {
 			
-			try {
-				if (statement != null) statement.close();
-				if (result != null) result.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			SqlUtility.closeStatement(statement);
+			SqlUtility.closeResultSet(result);
 			connectionPool.returnConnection(connection);
 		}
 		
-		return false;
+		return flag;
 	}
 
 	@Override
@@ -147,23 +142,13 @@ public class CompanyDBDAO implements CompanyDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			try {
-				connection.rollback();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			SqlUtility.rollbackConnection(connection);
+			
 		} finally {
 			
-			try {
-				if (preparedSt != null) preparedSt.close();
-				connection.setAutoCommit(true);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			SqlUtility.closeStatement(preparedSt);
 			connectionPool.returnConnection(connection);
-		}
+		}		
 	}
 
 	@Override
@@ -190,12 +175,7 @@ public class CompanyDBDAO implements CompanyDAO {
 			
 		} finally {
 			
-			try {
-				if (preparedSt != null) preparedSt.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			SqlUtility.closeStatement(preparedSt);
 			connectionPool.returnConnection(connection);
 		}
 	}
@@ -218,6 +198,7 @@ public class CompanyDBDAO implements CompanyDAO {
 				
 				company = new Company(result.getString(2), result.getString(3), result.getString(4));
 				company.setCompanyId(result.getLong(1));
+				
 			} else {
 				// TODO throw ecxeption
 			}
@@ -225,14 +206,10 @@ public class CompanyDBDAO implements CompanyDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		} finally {
 			
-			try {
-				if (statement != null) statement.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			SqlUtility.closeStatement(statement);
 			connectionPool.returnConnection(connection);
 		}
 		return company;
@@ -262,14 +239,10 @@ public class CompanyDBDAO implements CompanyDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		} finally {
 			
-			try {
-				if (statement != null) statement.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			SqlUtility.closeStatement(statement);
 			connectionPool.returnConnection(connection);
 		}
 		return companyList;
@@ -282,6 +255,7 @@ public class CompanyDBDAO implements CompanyDAO {
 		PreparedStatement preparedStatement = null;
 		ResultSet result = null;
 		String sql = null;
+		boolean flag = false;
 		
 		try {
 			
@@ -291,22 +265,17 @@ public class CompanyDBDAO implements CompanyDAO {
 			preparedStatement.setString(2, password);
 			
 			result = preparedStatement.executeQuery();
-			if (result.next()) return true;
+			if (result.next()) flag = true;
 			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			
-			try {
-				if (preparedStatement != null) preparedStatement.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			SqlUtility.closeStatement(preparedStatement);
 			connectionPool.returnConnection(connection);
 		}
-		return false;
+		return flag;
 	}
 
 	@Override
@@ -330,6 +299,7 @@ public class CompanyDBDAO implements CompanyDAO {
 				company.setCompName(result.getString(2));
 				company.setPassword(result.getString(3));
 				company.setEmail(result.getString(4));
+				
 			} else {
 				// TODO some kind of exception?
 			}
@@ -339,12 +309,7 @@ public class CompanyDBDAO implements CompanyDAO {
 			e.printStackTrace();
 		} finally {
 			
-			try {
-				if (statement != null) statement.close();
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			SqlUtility.closeStatement(statement);
 			connectionPool.returnConnection(connection);
 		}
 		

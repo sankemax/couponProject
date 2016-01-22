@@ -19,7 +19,7 @@ public class CustomerDBDAO implements CustomerDAO {
 		
 		Connection connection = pool.getConnection();
 		String sql = "INSERT INTO Customer (CUST_NAME, PASSWORD) VALUES(?,?)";
-		ResultSet rs;
+		ResultSet rs = null;
 		
 			try(PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS); ) {
 				
@@ -82,7 +82,7 @@ public class CustomerDBDAO implements CustomerDAO {
 			ps.setString(1, customer.getPassword());
 			ps.setLong(2, customer.getId());
 			if(!ps.execute()){
-				//TODO жшйчъ щвйад: щн ма чййн ботшлъ
+				//TODO пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			}
 			
 		} catch (SQLException e) {
@@ -110,7 +110,7 @@ public class CustomerDBDAO implements CustomerDAO {
 				customer = new Customer(rs.getString(2), rs.getString(3));
 				customer.setId(rs.getLong(1));
 			}else{
-				// TODO жшйчъ щвйад: ъ.ж. ма чййн ботшлъ
+				// TODO пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: пїЅ.пїЅ. пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			}
 			rs.close();
 		} catch (SQLException e) {
@@ -167,7 +167,7 @@ public class CustomerDBDAO implements CustomerDAO {
 				customer = new Customer(rs.getString(2), rs.getString(3));
 				customer.setId(rs.getLong(1));
 			}else{
-				// TODO жшйчъ щвйад: щн ма чййн ботшлъ
+				// TODO пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 			}
 			rs.close();
 		} catch (SQLException e) {
@@ -181,17 +181,18 @@ public class CustomerDBDAO implements CustomerDAO {
 
 	@Override
 	public boolean isNameExists(Customer customer) {
+		
 		Connection connection = pool.getConnection();
 		String sql = "SELECT * FROM Customer WHERE CUST_NAME = '" +customer.getCustName()+ "'FETCH FIRST ROW ONLY";
-		
 		ResultSet rs;
+		boolean flag = false;
 		
 		try(Statement st = connection.createStatement();){
 			
 			rs = st.executeQuery(sql);
 			
 			if(rs.next()){
-				return true;
+				flag = true;
 			}
 			rs.close();
 		} catch (SQLException e) {
@@ -200,7 +201,7 @@ public class CustomerDBDAO implements CustomerDAO {
 		}finally {
 			pool.returnConnection(connection);
 		}
-		return false;
+		return flag;
 	}
 	
 	@Override
@@ -209,6 +210,7 @@ public class CustomerDBDAO implements CustomerDAO {
 		Connection connection = pool.getConnection();
 		String sql = "SELECT * FROM Customer_Coupon WHERE CUST_ID = ? AND COUPON_ID = ? FETCH FIRST ROW ONLY";
 		ResultSet rs;
+		boolean flag = false;
 			
 		try(PreparedStatement ps = connection.prepareStatement(sql);){
 			
@@ -217,7 +219,7 @@ public class CustomerDBDAO implements CustomerDAO {
 			rs = ps.executeQuery();
 			
 			if(rs.next()){
-				return true;
+				flag = true;
 			}
 			rs.close();
 			
@@ -227,7 +229,7 @@ public class CustomerDBDAO implements CustomerDAO {
 		}finally {
 			pool.returnConnection(connection);
 		}
-		return false;
+		return flag;
 	}
 
 	@Override
@@ -248,9 +250,6 @@ public class CustomerDBDAO implements CustomerDAO {
 			st.execute(sql2);
 			connection.commit();
 		
-			
-			
-			
 		} catch (SQLException e) {
 			try {
 				connection.rollback();
@@ -267,17 +266,18 @@ public class CustomerDBDAO implements CustomerDAO {
 
 	@Override
 	public boolean login(String compName, String password) {
+		
 		Connection connection = pool.getConnection();
 		
 		String sql = "SELECT * FROM Customer WHERE CUST_NAME = '" + compName + "'FETCH FIRST ROW ONLY";
 		
 		try (Statement st= connection.createStatement(); ResultSet rs = st.executeQuery(sql);){
 			if(!rs.next()){
-				// TODO жшйчъ щвйад: щн ощъощ ма чййн ботшлъ
-				System.out.println("щн ма чййн");
-			}else if (!rs.getString(2).equals(password)){
-				// TODO жшйчъ щвйад: дсйсоа ма ъеаоъ мщн ощъощ
-				System.out.println("сйсоа ма рлерд");
+				// TODO пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+				System.out.println("пїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅ");
+			} else if (!rs.getString(2).equals(password)){
+				// TODO пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ: пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+				System.out.println("пїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ");
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -287,5 +287,4 @@ public class CustomerDBDAO implements CustomerDAO {
 		}
 		return true;
 	}
-
 }
