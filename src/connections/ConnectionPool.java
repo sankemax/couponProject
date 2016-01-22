@@ -69,6 +69,13 @@ public class ConnectionPool {
 	// after a connection has been used it will be returned to connection pool
 	public synchronized void returnConnection(Connection con) {
 		
+		try {
+			con.setAutoCommit(true);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		connections.add(con);
 		this.notify();
 	}

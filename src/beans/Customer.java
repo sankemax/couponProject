@@ -1,7 +1,10 @@
 package beans;
 
-public class Customer {
+import java.io.Serializable;
 
+public class Customer implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 	private long customerId;
 	private String custName;
 	private String password;
