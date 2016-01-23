@@ -2,43 +2,50 @@ package core;
 
 import connections.ConnectionPool;
 import facade.AdminFacade;
+import facade.CompanyFacade;
 import facade.CouponClientFacade;
+import facade.CustomerFacade;
 
 public class CouponSystem {
 	
-	private CouponSystem instance = new CouponSystem();
+	private static CouponSystem instance = new CouponSystem();
 	private DailyCouponExpirationTask dailyCouponExpirationTask; 
 	private ConnectionPool connectionPool;
-	private Thread thread;
+	private Thread maintenanceThread;
 	
 	private CouponSystem() {
-		
-		dailyCouponExpirationTask = new DailyCouponExpirationTask();
-		thread = new Thread(dailyCouponExpirationTask);
-		thread.start();
-		connectionPool = ConnectionPool.getInstance();
+		startCouponSystem();
 	}
 	
-	public CouponClientFacade login(String name, String password, ClientType type) {
+	private void startCouponSystem() {
+		
+		connectionPool = ConnectionPool.getInstance();
+		dailyCouponExpirationTask = new DailyCouponExpirationTask();
+		maintenanceThread = new Thread(dailyCouponExpirationTask);
+		maintenanceThread.start();
+	}
+	
+	public CouponClientFacade login(String name, String password, ClientType type) throws CouponSystemException {
 		
 		switch(type) {
+		
 			case ADMIN:
-				return(AdminFacade) new AdminFacade().login(name, password);
+				return (AdminFacade) new AdminFacade().login(name, password);
 			case COMPANY:
-				return(AdminFacade) new AdminFacade().login(name, password);
+				return (CompanyFacade) new CompanyFacade().login(name, password);
 			case CUSTOMER:
-				return(AdminFacade) new AdminFacade().login(name, password);
+				return (CustomerFacade) new CustomerFacade().login(name, password);
 		}
 		return null;
 	}
 	
-	public void shutdown(){
-		connectionPool.closeAllConnections();
+	public void shutdown() {
 		dailyCouponExpirationTask.stopTask();
-		thread.interrupt();
+		maintenanceThread.interrupt();
+		connectionPool.closeAllConnections();
 	}
 	
-	public CouponSystem getInstance() {
+	public static CouponSystem getInstance() {
 		return instance;
 	}
 

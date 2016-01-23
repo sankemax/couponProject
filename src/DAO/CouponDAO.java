@@ -3,6 +3,7 @@ package DAO;
 import java.util.List;
 import beans.Coupon;
 import beans.CouponType;
+import core.CouponSystemException;
 
 public interface CouponDAO {
 	
@@ -11,6 +12,7 @@ public interface CouponDAO {
 	public void updateCoupon(Coupon coupon);
 	public boolean isTitleExists(String title);
 	public Coupon getCoupon(long id);
+	public Coupon getCouponByTitle(String title) throws CouponSystemException;
 	public List<Coupon> getAllCoupons();
 	public List<Coupon> getAllCouponsCompany(long CompanyId);
 	public List<Coupon> getCouponsCompanyByType(long CompanyId, CouponType type);

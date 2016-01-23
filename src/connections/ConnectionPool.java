@@ -14,7 +14,7 @@ public class ConnectionPool {
 	private List<Connection> connections;
 	
 	// the url string, that leads to our DB
-	private String url = "jdbc:derby://localhost:1527/couponProject";
+	private String url = DbOperations.dbUrl;
 	
 	// private constructor. part of the singleton design pattern
 	private ConnectionPool() {
@@ -23,15 +23,11 @@ public class ConnectionPool {
 		connections = new ArrayList<>();
 		
 		// loading the Apache Derby driver
-		String driverName = "org.apache.derby.jdbc.ClientDriver";
-
 		try {
-			Class.forName(driverName);
-			System.out.println("driver loaded");
+			Class.forName(DbOperations.driverName);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		
 		
 		// populating connection pool with active connections
 		for (int i = 0; i < 10; i++) {

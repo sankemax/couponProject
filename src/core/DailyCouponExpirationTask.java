@@ -21,6 +21,7 @@ public class DailyCouponExpirationTask implements Runnable {
 	@Override
 	public void run() {
 		
+//		Thread.currentThread().setDaemon(true);
 		while (!quit) {
 			
 			Collection<Coupon> coupons = couponDAO.getAllCoupons();

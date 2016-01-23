@@ -10,6 +10,7 @@ import java.util.List;
 import DAO.CustomerDAO;
 import beans.Customer;
 import connections.ConnectionPool;
+import core.CouponSystemException;
 
 public class CustomerDBDAO implements CustomerDAO {
 	
@@ -81,8 +82,8 @@ public class CustomerDBDAO implements CustomerDAO {
 			
 			ps.setString(1, customer.getPassword());
 			ps.setLong(2, customer.getId());
-			if(!ps.execute()){
-				//TODO ����� �����: �� �� ���� ������
+			if (!ps.execute()){
+				// TODO  the execute will always return false because there is no resultSet object so what is the purpose of this check?
 			}
 			
 		} catch (SQLException e) {
@@ -205,7 +206,7 @@ public class CustomerDBDAO implements CustomerDAO {
 	}
 	
 	@Override
-	public boolean IsPurchased(long customerId, long couponId) {
+	public boolean isPurchased(long customerId, long couponId) {
 		
 		Connection connection = pool.getConnection();
 		String sql = "SELECT * FROM Customer_Coupon WHERE CUST_ID = ? AND COUPON_ID = ? FETCH FIRST ROW ONLY";
@@ -265,16 +266,19 @@ public class CustomerDBDAO implements CustomerDAO {
 	}
 
 	@Override
-	public boolean login(String compName, String password) {
+	public boolean login(String compName, String password) throws CouponSystemException {
 		
 		Connection connection = pool.getConnection();
 		
 		String sql = "SELECT * FROM Customer WHERE CUST_NAME = '" + compName + "'FETCH FIRST ROW ONLY";
 		
 		try (Statement st= connection.createStatement(); ResultSet rs = st.executeQuery(sql);){
+			
 			if(!rs.next()){
-				// TODO ����� �����: �� ����� �� ���� ������
-				System.out.println("�� �� ����");
+				
+				throw new CouponSystemException("invalid username or password");
+				
+			// TODO i think that the next else if is redundant 	
 			} else if (!rs.getString(2).equals(password)){
 				// TODO ����� �����: ������ �� ����� ��� �����
 				System.out.println("����� �� �����");
@@ -282,7 +286,8 @@ public class CustomerDBDAO implements CustomerDAO {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}finally {
+		} finally {
+			
 			pool.returnConnection(connection);
 		}
 		return true;

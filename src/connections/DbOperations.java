@@ -13,9 +13,12 @@ import java.util.Scanner;
 
 public class DbOperations {
 	
-	private static final String dbUrl = "jdbc:derby://localhost:1527/couponDB;create=true;user=admin;password=123";
-	private static final String driverName = "org.apache.derby.jdbc.ClientDriver"; 
-	private static final String tableInfoPath = "src/TABLES.txt";
+	public static final String dbName = "couponDB";
+	public static final String dbUser = "admin";
+	public static final String dbPassword = "123";	
+	public static final String dbUrl = "jdbc:derby://localhost:1527/" + dbName + ";create=true;user=" + dbUser + ";password=" + dbPassword;
+	public static final String driverName = "org.apache.derby.jdbc.ClientDriver"; 
+	public static final String tableInfoPath = "src/TABLES.txt";
 	
 	public static void main(String[] args) {	
 		createDbAndTables();
