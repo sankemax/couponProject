@@ -27,7 +27,7 @@ public class CustomerFacade implements CouponClientFacade {
 		coupon.setCouponId(couponDAO.getCouponByTitle(coupon.getTitle()).getId());
 		
 		if(customerDAO.isPurchased(customer.getId(), coupon.getId())){
-			// TODO Auto-generated catch block
+			throw new CouponSystemException("you have already purchased this coupon");
 		}
 		if(couponDAO.getCoupon(coupon.getId()).getAmount() <= 0){
 			throw new CouponSystemException("this coupon is out of stock");

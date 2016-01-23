@@ -44,7 +44,7 @@ public class CompanyFacade implements CouponClientFacade {
 		return couponDAO.getCoupon(id);
 	}
 	
-	public List<Coupon> getAllCoupon(){
+	public List<Coupon> getAllCoupons(){
 
 		return couponDAO.getAllCouponsCompany(company.getId());
 	}

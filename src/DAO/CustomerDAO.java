@@ -16,6 +16,6 @@ public interface CustomerDAO {
 	public Customer getCustomerByName(String name);
 	public boolean isNameExists(Customer customer);
 	public boolean isPurchased(long customerId, long CouponId);
-	public void purchaseCoupon(long customerId, long CouponId);
+	public void purchaseCoupon(long customerId, long CouponId) throws CouponSystemException;
 
 }
