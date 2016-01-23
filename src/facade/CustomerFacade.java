@@ -6,6 +6,7 @@ import java.util.List;
 import DAO.*;
 import DBDAO.*;
 import beans.*;
+import core.CouponSystemException;
 
 
 public class CustomerFacade implements CouponClientFacade {
@@ -21,16 +22,18 @@ public class CustomerFacade implements CouponClientFacade {
 		couponDAO = new CouponDBDAO();
 	}
 	
-	public void purchaseCoupon(Coupon coupon){
+	public void purchaseCoupon(Coupon coupon) throws CouponSystemException{
 		
-		if(customerDAO.IsPurchased(customer.getId(), coupon.getId())){
+		coupon.setCouponId(couponDAO.getCouponByTitle(coupon.getTitle()).getId());
+		
+		if(customerDAO.isPurchased(customer.getId(), coupon.getId())){
 			// TODO Auto-generated catch block
 		}
 		if(couponDAO.getCoupon(coupon.getId()).getAmount() <= 0){
-			// TODO Auto-generated catch block
+			throw new CouponSystemException("this coupon is out of stock");
 		}
 		if(couponDAO.getCoupon(coupon.getId()).getEndDate().after(new Date())){
-			// TODO Auto-generated catch block
+			throw new CouponSystemException("coupon expiration date has passed");			
 		}
 		customerDAO.purchaseCoupon(customer.getId(), coupon.getId());
 	}
@@ -52,19 +55,12 @@ public class CustomerFacade implements CouponClientFacade {
 	}
 	
 	@Override
-	public CouponClientFacade login(String name, String password) {
+	public CouponClientFacade login(String name, String password) throws CouponSystemException {
 
-		if(!customerDAO.login(name, password)){
-			// TODO Auto-generated method stub
+		if (!customerDAO.login(name, password)){
+			throw new CouponSystemException("username or password is incorrect");
 		}
 		customer = customerDAO.getCustomerByName(name);
 		return this;
-
 	}
-
-	
-	
-	
-	
-	
 }

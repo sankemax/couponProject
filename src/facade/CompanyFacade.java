@@ -5,6 +5,7 @@ import java.util.List;
 import DAO.*;
 import DBDAO.*;
 import beans.*;
+import core.CouponSystemException;
 
 
 public class CompanyFacade implements CouponClientFacade {
@@ -20,11 +21,10 @@ public class CompanyFacade implements CouponClientFacade {
 		companyDAO = new CompanyDBDAO();
 	}
 	
-	public void createCoupon(Coupon coupon){
+	public void createCoupon(Coupon coupon) throws CouponSystemException{
 
 		if(couponDAO.isTitleExists(coupon.getTitle())) {
-			// TODO Auto-generated catch block
-			System.out.println("title of coupon already exists");
+			throw new CouponSystemException("coupon already exists");
 		}
 		couponDAO.createCoupon(company.getId(), coupon);
 	}
@@ -55,10 +55,10 @@ public class CompanyFacade implements CouponClientFacade {
 	}
 	
 	@Override
-	public CouponClientFacade login(String name, String password) {
+	public CouponClientFacade login(String name, String password) throws CouponSystemException {
 
-		if(!companyDAO.login(name, password)){
-			// TODO Auto-generated method stub
+		if (!companyDAO.login(name, password)) {
+			throw new CouponSystemException("username or password is incorrect");
 		}
 		company = companyDAO.getCompanyByName(name);
 		return this;
