@@ -36,10 +36,8 @@ public class DbOperations {
 			
 			// loading the Apache Derby driver
 			Class.forName(driverName);
-			System.out.println("driver loaded");
 			
 			connection = DriverManager.getConnection(dbUrl);
-			System.out.println("connection received");
 			connection.setAutoCommit(false);
 			
 			List<String> tableNames = new ArrayList<>();		
@@ -61,7 +59,6 @@ public class DbOperations {
 				}
 			}
 			connection.commit();
-			System.out.println("tables created successfully");
 			
 		} catch (SQLException | FileNotFoundException | ClassNotFoundException e) {
 			// TODO Auto-generated catch block

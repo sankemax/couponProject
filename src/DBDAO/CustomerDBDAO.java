@@ -10,6 +10,7 @@ import java.util.List;
 import DAO.CustomerDAO;
 import beans.Customer;
 import connections.ConnectionPool;
+import connections.SqlUtility;
 import core.CouponSystemException;
 
 public class CustomerDBDAO implements CustomerDAO {
@@ -234,14 +235,15 @@ public class CustomerDBDAO implements CustomerDAO {
 	}
 
 	@Override
-	public void purchaseCoupon(long customerId, long couponId) {
+	public void purchaseCoupon(long customerId, long couponId) throws CouponSystemException {
 		Connection connection = pool.getConnection();
 		
-		String sql1 = "INSERT INTO Customer_Coupon (CUST_ID, COUPON_ID) VALUES(?,?)";
-		String sql2 = "UPDATE Coupon SET AMOUNT = AMOUNT - 1 WHERE ID = " + couponId;
+		String sql1 = "INSERT INTO customer_coupon (CUST_ID, COUPON_ID) VALUES(?,?)";
+		String sql2 = "UPDATE coupon SET amount = amount - 1 WHERE id = " + couponId;
 		
-		
-		try (PreparedStatement ps = connection.prepareStatement(sql1); Statement st = connection.createStatement()){
+		try (PreparedStatement ps = connection.prepareStatement(sql1); 
+				Statement st = connection.createStatement()){
+			
 			connection.setAutoCommit(false);
 			
 			ps.setLong(1, customerId);
@@ -252,44 +254,37 @@ public class CustomerDBDAO implements CustomerDAO {
 			connection.commit();
 		
 		} catch (SQLException e) {
-			try {
-				connection.rollback();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}finally {
+			
+			SqlUtility.rollbackConnection(connection);
+			throw new CouponSystemException("error. try again.");
+			
+		} finally {
+			
 			pool.returnConnection(connection);
 		}
 	}
 
 	@Override
-	public boolean login(String compName, String password) throws CouponSystemException {
+	public boolean login(String customerName, String password) throws CouponSystemException {
 		
 		Connection connection = pool.getConnection();
 		
-		String sql = "SELECT * FROM Customer WHERE CUST_NAME = '" + compName + "'FETCH FIRST ROW ONLY";
+		String sql = "SELECT customer.id FROM customer WHERE customer.cust_name = '" + customerName + "' AND customer.password = '" + password + "' FETCH FIRST ROW ONLY";
+		boolean flag = false;
 		
-		try (Statement st= connection.createStatement(); ResultSet rs = st.executeQuery(sql);){
+		try (Statement st= connection.createStatement(); 
+				ResultSet rs = st.executeQuery(sql);){
 			
-			if(!rs.next()){
-				
-				throw new CouponSystemException("invalid username or password");
-				
-			// TODO i think that the next else if is redundant 	
-			} else if (!rs.getString(2).equals(password)){
-				// TODO ����� �����: ������ �� ����� ��� �����
-				System.out.println("����� �� �����");
-			}
+			if(rs.next()) flag = true;
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			
 		} finally {
 			
 			pool.returnConnection(connection);
 		}
-		return true;
+		return flag;
 	}
 }

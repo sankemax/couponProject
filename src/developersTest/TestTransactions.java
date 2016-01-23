@@ -25,14 +25,26 @@ public class TestTransactions {
 			Company company = new Company("tryonics", "bigboss123", "this@is.sparta");
 			Coupon coupon = new Coupon("clothes sale", new Date(), new Date(new Date().getTime() + 1000000), 10, CouponType.SPORTS, "buy me please!", 145.5, "http://something.co");
 			Customer customer = new Customer("mike", "red full");
+			Customer customer2 = new Customer("herold", "shephard");
+			Customer customer3 = new Customer("brian", "life");
 //			ad.createCompany(company);
 //			ad.createCustomer(customer);
+//			ad.createCustomer(customer2);
+//			ad.createCustomer(customer3);
 			
 			CompanyFacade cf = (CompanyFacade) couponSystem.login("tryonics", "bigboss123", ClientType.COMPANY);
 //			cf.createCoupon(coupon);
 			
 			CustomerFacade cuf = (CustomerFacade) couponSystem.login("mike", "red full", ClientType.CUSTOMER);
-			cuf.purchaseCoupon(coupon);
+			CustomerFacade cuf2 = (CustomerFacade) couponSystem.login("herold", "shephard", ClientType.CUSTOMER);
+			CustomerFacade cuf3 = (CustomerFacade) couponSystem.login("brian", "life", ClientType.CUSTOMER);
+//			cuf.purchaseCoupon(coupon);
+//			cuf2.purchaseCoupon(coupon);
+//			cuf3.purchaseCoupon(coupon);
+			
+//			System.out.println(cuf.getAllpurchasedCouponByType(CouponType.SPORTS));
+//			System.out.println(cuf.getAllpurchasedCoupons());		
+//			System.out.println(cf.getAllCoupons());	
 			
 		} catch (CouponSystemException e) {
 			e.printStackTrace();
