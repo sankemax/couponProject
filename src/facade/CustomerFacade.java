@@ -67,4 +67,8 @@ public class CustomerFacade implements CouponClientFacade {
 		customer = customerDAO.getCustomerByName(name);
 		return this;
 	}
+
+	public Customer getCustomerByName(String name){
+		return customerDAO.getCustomerByName(name);
+	}
 }

@@ -58,5 +58,8 @@ public class CompanyFacade implements CouponClientFacade {
 		company = companyDAO.getCompanyByName(name);
 		return this;
 	}
-
+	
+	public Company getCompanyByName(String name){
+		return companyDAO.getCompanyByName(name);
+	}
 }
