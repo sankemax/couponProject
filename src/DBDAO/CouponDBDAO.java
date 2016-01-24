@@ -84,7 +84,7 @@ public class CouponDBDAO implements CouponDAO {
 	}
 
 	@Override
-	public void removeCoupon(Coupon coupon) {
+	public void removeCoupon(Coupon coupon) throws CouponSystemException {
 
 		Connection connection = connectionPool.getConnection();
 		String sql = null;
@@ -95,34 +95,30 @@ public class CouponDBDAO implements CouponDAO {
 			connection.setAutoCommit(false);
 			
 			long couponId = coupon.getId();
+			
 			sql = "DELETE FROM customer_coupon WHERE coupon_id = ?";
 			preparedSt = connection.prepareStatement(sql);
-			
 			preparedSt.setLong(1, couponId);
-			preparedSt.executeQuery();
+			preparedSt.executeUpdate();
 			preparedSt.close();
 			
 			sql = "DELETE FROM company_coupon WHERE coupon_id = ?";
-			preparedSt = connection.prepareStatement(sql);
-			preparedSt.close();
-			
+			preparedSt = connection.prepareStatement(sql);			
 			preparedSt.setLong(1, couponId);
-			preparedSt.executeQuery();
+			preparedSt.executeUpdate();			
 			preparedSt.close();
 			
 			sql = "DELETE FROM coupon WHERE id = ?";
 			preparedSt = connection.prepareStatement(sql);
-			preparedSt.close();
-			
 			preparedSt.setLong(1, couponId);
-			preparedSt.executeQuery();
+			preparedSt.executeUpdate();			
 			
 			connection.commit();
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			SqlUtility.rollbackConnection(connection);
+			e.printStackTrace(); // for now
+			throw new CouponSystemException("the system encountered an error");
 			
 		} finally {
 			

@@ -18,12 +18,13 @@ public class TestTransactions {
 	public static void main(String[] args) {
 		DbOperations.main(null);
 		CouponSystem couponSystem = CouponSystem.getInstance();
+		
 		try {
 			
 			AdminFacade ad = (AdminFacade) couponSystem.login("admin", "1234", ClientType.ADMIN);
 			
 			Company company = new Company("tryonics", "bigboss123", "this@is.sparta");
-			Coupon coupon = new Coupon("clothes sale", new Date(), new Date(new Date().getTime() + 1000000), 10, CouponType.SPORTS, "buy me please!", 145.5, "http://something.co");
+			Coupon coupon = new Coupon("clothes sale", new Date(), new Date(new Date().getTime() + 1000*3600*24), 10, CouponType.SPORTS, "buy me please!", 145.5, "http://something.co");
 			Customer customer = new Customer("mike", "red full");
 			Customer customer2 = new Customer("herold", "shephard");
 			Customer customer3 = new Customer("brian", "life");
@@ -42,9 +43,9 @@ public class TestTransactions {
 //			cuf2.purchaseCoupon(coupon);
 //			cuf3.purchaseCoupon(coupon);
 			
-//			System.out.println(cuf.getAllpurchasedCouponByType(CouponType.SPORTS));
-//			System.out.println(cuf.getAllpurchasedCoupons());		
-//			System.out.println(cf.getAllCoupons());	
+			System.out.println(cuf.getAllpurchasedCouponByType(CouponType.SPORTS));
+			System.out.println(cuf.getAllpurchasedCoupons());		
+			System.out.println(cf.getAllCoupons());	
 			
 		} catch (CouponSystemException e) {
 			e.printStackTrace();
