@@ -117,8 +117,8 @@ public class CouponDBDAO implements CouponDAO {
 			
 		} catch (SQLException e) {
 			SqlUtility.rollbackConnection(connection);
-			e.printStackTrace(); // for now
-			throw new CouponSystemException("the system encountered an error");
+			e.printStackTrace(); // TODO for now
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
 			
@@ -416,12 +416,13 @@ public class CouponDBDAO implements CouponDAO {
 				coupon.setCouponId(result.getLong(1));
 			} else {
 				
-				throw new CouponSystemException("coupon does not exist");
+				throw new CouponSystemException(CouponSystemException.COUPON_NOT_EXIST_ERROR);
 			}
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			e.printStackTrace(); // TODO for now
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
 			

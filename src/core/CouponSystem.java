@@ -36,7 +36,7 @@ public class CouponSystem {
 			case CUSTOMER:
 				return (CustomerFacade) new CustomerFacade().login(name, password);
 		}
-		return null;
+		throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 	}
 	
 	public void shutdown() {
