@@ -4,6 +4,11 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import beans.Coupon;
+import beans.CouponType;
 
 public class SqlUtility {
 
@@ -53,5 +58,30 @@ public class SqlUtility {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public static List<Coupon> createCoupons(ResultSet resultSet){
+		List<Coupon> couponList = new ArrayList<Coupon>();
+		
+		try {
+			while (resultSet.next()) {
+				
+				Coupon coupon = new Coupon(resultSet.getString(2), 
+						new java.util.Date(resultSet.getDate(3).getTime()), 
+						new java.util.Date(resultSet.getDate(4).getTime()),
+						resultSet.getInt(5),
+						CouponType.valueOf(resultSet.getString(6)),
+						resultSet.getString(7),
+						resultSet.getDouble(8),
+						resultSet.getString(9));
+				coupon.setCouponId(resultSet.getLong(1));
+				couponList.add(coupon);
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return couponList;
 	}
 }
