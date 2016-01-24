@@ -256,7 +256,7 @@ public class CustomerDBDAO implements CustomerDAO {
 		} catch (SQLException e) {
 			
 			SqlUtility.rollbackConnection(connection);
-			throw new CouponSystemException("error. try again.");
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
 			
@@ -278,8 +278,9 @@ public class CustomerDBDAO implements CustomerDAO {
 			if(rs.next()) flag = true;
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
+			e.printStackTrace(); // TODO for now
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
 			
