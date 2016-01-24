@@ -21,7 +21,7 @@ public class CompanyFacade implements CouponClientFacade {
 		companyDAO = new CompanyDBDAO();
 	}
 	
-	public void createCoupon(Coupon coupon) throws CouponSystemException{
+	public void createCoupon(Coupon coupon) throws CouponSystemException {
 
 		if(couponDAO.isTitleExists(coupon.getTitle())) {
 			throw new CouponSystemException("coupon already exists");
@@ -29,28 +29,23 @@ public class CompanyFacade implements CouponClientFacade {
 		couponDAO.createCoupon(company.getId(), coupon);
 	}
 	
-	public void removeCoupon(Coupon coupon){
-
+	public void removeCoupon(Coupon coupon) throws CouponSystemException {
 		couponDAO.removeCoupon(coupon);
 	}
 	
-	public void updateCoupon(Coupon coupon){
-
-			couponDAO.updateCoupon(coupon);
+	public void updateCoupon(Coupon coupon) {
+		couponDAO.updateCoupon(coupon);
 	}
 	
 	public Coupon getCoupon(long id){
-		
 		return couponDAO.getCoupon(id);
 	}
 	
 	public List<Coupon> getAllCoupons(){
-
 		return couponDAO.getAllCouponsCompany(company.getId());
 	}
 	
 	public List<Coupon> getCouponByType(CouponType type){
-
 		return couponDAO.getCouponsCompanyByType(company.getId(), type);
 	}
 	

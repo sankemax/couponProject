@@ -32,7 +32,7 @@ public class CustomerFacade implements CouponClientFacade {
 		if(couponDAO.getCoupon(coupon.getId()).getAmount() <= 0){
 			throw new CouponSystemException("this coupon is out of stock");
 		}
-		if(couponDAO.getCoupon(coupon.getId()).getEndDate().after(new Date())){
+		if(couponDAO.getCoupon(coupon.getId()).getEndDate().before(new Date())){
 			throw new CouponSystemException("coupon expiration date has passed");			
 		}
 		customerDAO.purchaseCoupon(customer.getId(), coupon.getId());

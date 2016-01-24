@@ -40,6 +40,7 @@ public class CouponSystem {
 	}
 	
 	public void shutdown() {
+		
 		dailyCouponExpirationTask.stopTask();
 		maintenanceThread.interrupt();
 		connectionPool.closeAllConnections();

@@ -8,7 +8,7 @@ import core.CouponSystemException;
 public interface CouponDAO {
 	
 	public void createCoupon(long CompanyId, Coupon coupon);
-	public void removeCoupon(Coupon coupon);
+	public void removeCoupon(Coupon coupon) throws CouponSystemException;
 	public void updateCoupon(Coupon coupon);
 	public boolean isTitleExists(String title);
 	public Coupon getCoupon(long id);
