@@ -125,18 +125,12 @@ public class CouponDBDAO implements CouponDAO {
 		
 		try {
 			
-			String sql = "UPDATE coupon SET title = ?, start_date = ?, end_date = ?, amount = ?, coupon_type = ?, message = ?, price = ?, image = ? WHERE id = ?";
+			String sql = "UPDATE coupon SET end_date = ?, price = ?, WHERE id = ?";
 			
 			preparedSt = connection.prepareStatement(sql);
-			preparedSt.setString(1, coupon.getTitle());
-			preparedSt.setDate(2, new java.sql.Date(coupon.getStartDate().getTime()));
-			preparedSt.setDate(3, new java.sql.Date(coupon.getEndDate().getTime()));
-			preparedSt.setInt(4, coupon.getAmount());
-			preparedSt.setString(5, coupon.getType().toString());
-			preparedSt.setString(6, coupon.getMessage());
-			preparedSt.setDouble(7, coupon.getPrice());
-			preparedSt.setString(8, coupon.getImage());
-			preparedSt.setLong(9, coupon.getId());
+			preparedSt.setDate(1, new java.sql.Date(coupon.getEndDate().getTime()));
+			preparedSt.setDouble(2, coupon.getPrice());
+			preparedSt.setLong(3, coupon.getId());
 			preparedSt.executeUpdate();
 			
 		} catch (SQLException e) {

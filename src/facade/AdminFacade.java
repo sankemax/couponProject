@@ -21,6 +21,8 @@ public class AdminFacade implements CouponClientFacade{
 	}
 	
 	public void createCompany(Company company) throws CouponSystemException{
+		company.setCompName(company.getCompName().toLowerCase());
+		
 		if (companyDAO.isNameExists(company.getCompName())){
 			throw new CouponSystemException(CouponSystemException.COMPANY_EXISTS);
 		}
@@ -44,6 +46,9 @@ public class AdminFacade implements CouponClientFacade{
 	}
 	
 	public void createCustomer(Customer customer) throws CouponSystemException{
+		
+		customer.setCustName(customer.getCustName().toLowerCase());
+		
 		if (customerDAO.isNameExists(customer)){
 			throw new CouponSystemException(CouponSystemException.CUSTOMER_EXISTS);
 		}
@@ -70,7 +75,7 @@ public class AdminFacade implements CouponClientFacade{
 	
 	@Override
 	public CouponClientFacade login(String name, String password) throws CouponSystemException {
-		
+		name = name.toLowerCase();
 		if (name.equals("admin") && password.equals("1234")) {
 			return this;
 		} else {

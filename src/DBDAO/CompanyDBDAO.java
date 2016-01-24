@@ -160,13 +160,12 @@ public class CompanyDBDAO implements CompanyDAO {
 		
 		try {
 						
-			sql = "UPDATE company SET comp_name = ?, password = ?, email = ? WHERE id = ?";
+			sql = "UPDATE company SET password = ?, email = ? WHERE id = ?";
 			
 			preparedSt = connection.prepareStatement(sql);
-			preparedSt.setString(1, company.getCompName());
-			preparedSt.setString(2, company.getPassword());
-			preparedSt.setString(3, company.getEmail());
-			preparedSt.setLong(4, company.getId());
+			preparedSt.setString(1, company.getPassword());
+			preparedSt.setString(2, company.getEmail());
+			preparedSt.setLong(3, company.getId());
 			preparedSt.executeUpdate();
 					
 		} catch (SQLException e) {

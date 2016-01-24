@@ -60,7 +60,7 @@ public class CustomerFacade implements CouponClientFacade {
 	
 	@Override
 	public CouponClientFacade login(String name, String password) throws CouponSystemException {
-
+		name = name.toLowerCase();
 		if (!customerDAO.login(name, password)){
 			throw new CouponSystemException(CouponSystemException.USERNAME_PASSWORD_ERROR);
 		}
@@ -69,6 +69,6 @@ public class CustomerFacade implements CouponClientFacade {
 	}
 
 	public Customer getCustomerByName(String name){
-		return customerDAO.getCustomerByName(name);
+		return customerDAO.getCustomerByName(name.toLowerCase());
 	}
 }

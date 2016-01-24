@@ -58,12 +58,7 @@ public class CustomerDBDAO implements CustomerDAO {
 			connection.commit();
 			
 		} catch (SQLException e) {
-			try {
-				connection.rollback();
-			} catch (SQLException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			SqlUtility.rollbackConnection(connection);
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {

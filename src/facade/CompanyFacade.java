@@ -22,7 +22,8 @@ public class CompanyFacade implements CouponClientFacade {
 	}
 	
 	public void createCoupon(Coupon coupon) throws CouponSystemException {
-
+		coupon.setTitle(coupon.getTitle().toLowerCase());
+		
 		if(couponDAO.isTitleExists(coupon.getTitle())) {
 			throw new CouponSystemException(CouponSystemException.COUPON_EXISTS);
 		}
@@ -51,7 +52,8 @@ public class CompanyFacade implements CouponClientFacade {
 	
 	@Override
 	public CouponClientFacade login(String name, String password) throws CouponSystemException {
-
+		name = name.toLowerCase();
+		
 		if (!companyDAO.login(name, password)) {
 			throw new CouponSystemException(CouponSystemException.USERNAME_PASSWORD_ERROR);
 		}
@@ -60,6 +62,6 @@ public class CompanyFacade implements CouponClientFacade {
 	}
 	
 	public Company getCompanyByName(String name){
-		return companyDAO.getCompanyByName(name);
+		return companyDAO.getCompanyByName(name.toLowerCase());
 	}
 }
