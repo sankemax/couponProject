@@ -1,10 +1,6 @@
 package DBDAO;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import DAO.CompanyDAO;
@@ -13,16 +9,17 @@ import beans.Company;
 import beans.Coupon;
 import connections.ConnectionPool;
 import connections.SqlUtility;
+import core.CouponSystemException;
 
 public class CompanyDBDAO implements CompanyDAO {
 	ConnectionPool connectionPool;
 	
-	public CompanyDBDAO() {
+	public CompanyDBDAO() throws CouponSystemException {
 		connectionPool = ConnectionPool.getInstance();
 	}
 
 	@Override
-	public void createCompany(Company company) {
+	public void createCompany(Company company) throws CouponSystemException {
 
 		Connection connection = connectionPool.getConnection();
 		PreparedStatement preparedSt = null;
@@ -34,24 +31,23 @@ public class CompanyDBDAO implements CompanyDAO {
 			sql = "INSERT INTO company(comp_name, password, email) VALUES(?, ?, ?)";
 			
 			preparedSt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			
 			preparedSt.setString(1, company.getCompName());
 			preparedSt.setString(2, company.getPassword());
 			preparedSt.setString(3, company.getEmail());
+			
 			preparedSt.executeUpdate();
 
 			connection.commit();
 			generatedKeys = preparedSt.getGeneratedKeys();
 			
-			if (generatedKeys.next()) {
-				
-				company.setCompanyId(generatedKeys.getLong(1));
-			} else {
-				// TODO throw exception?
-			}
+			generatedKeys.next();
+			company.setCompanyId(generatedKeys.getLong(1));
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
+			
 			SqlUtility.rollbackConnection(connection);
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
 			
@@ -62,13 +58,13 @@ public class CompanyDBDAO implements CompanyDAO {
 	}
 
 	@Override
-	public boolean isNameExists(String companyName) {
+	public boolean isNameExists(String companyName) throws CouponSystemException {
 		
 		Connection connection = connectionPool.getConnection();
 		Statement statement = null;
 		ResultSet result = null;
 		String sql = null;
-		boolean flag = false;
+		boolean flag = false ;
 		
 		try {
 			
@@ -77,22 +73,19 @@ public class CompanyDBDAO implements CompanyDAO {
 			result = statement.executeQuery(sql);
 			if (result.next()) flag = true;
 			
+			return flag;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		} finally {
 			
 			SqlUtility.closeStatement(statement);
 			SqlUtility.closeResultSet(result);
 			connectionPool.returnConnection(connection);
 		}
-		
-		return flag;
 	}
 
 	@Override
-	public void removeCompany(Company company) {
+	public void removeCompany(Company company) throws CouponSystemException {
 
 		Connection connection = connectionPool.getConnection();
 		String sql = null;
@@ -140,9 +133,8 @@ public class CompanyDBDAO implements CompanyDAO {
 			connection.commit();
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			SqlUtility.rollbackConnection(connection);
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
 			
@@ -152,7 +144,7 @@ public class CompanyDBDAO implements CompanyDAO {
 	}
 
 	@Override
-	public void updateCompany(Company company) {
+	public void updateCompany(Company company) throws CouponSystemException {
 
 		Connection connection = connectionPool.getConnection();
 		PreparedStatement preparedSt = null;
@@ -166,11 +158,13 @@ public class CompanyDBDAO implements CompanyDAO {
 			preparedSt.setString(1, company.getPassword());
 			preparedSt.setString(2, company.getEmail());
 			preparedSt.setLong(3, company.getId());
-			preparedSt.executeUpdate();
+			
+			if (!preparedSt.execute()){
+				throw new CouponSystemException(CouponSystemException.COMPANY_NOT_EXISTS);
+			}
 					
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
 			
@@ -180,7 +174,7 @@ public class CompanyDBDAO implements CompanyDAO {
 	}
 
 	@Override
-	public Company getCompany(long id) {
+	public Company getCompany(long id) throws CouponSystemException {
 		
 		Connection connection = connectionPool.getConnection();
 		ResultSet result = null;
@@ -199,12 +193,11 @@ public class CompanyDBDAO implements CompanyDAO {
 				company.setCompanyId(result.getLong(1));
 				
 			} else {
-				// TODO throw ecxeption
+				throw new CouponSystemException(CouponSystemException.COMPANY_NOT_EXISTS);
 			}
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
 			
@@ -215,7 +208,7 @@ public class CompanyDBDAO implements CompanyDAO {
 	}
 
 	@Override
-	public List<Company> getAllCompanies() {
+	public List<Company> getAllCompanies() throws CouponSystemException {
 		
 		Connection connection = connectionPool.getConnection();
 		Statement statement = null;
@@ -228,16 +221,18 @@ public class CompanyDBDAO implements CompanyDAO {
 			sql = "SELECT * FROM company";
 			statement = connection.createStatement();
 			resultSet = statement.executeQuery(sql);
-			while (resultSet.next()) {
-				
-				Company company = new Company(resultSet.getString(2), resultSet.getString(3), resultSet.getString(4));
-				company.setCompanyId(resultSet.getLong(1));
-				companyList.add(company);
+			if(resultSet.next()){
+				do{
+					Company company = new Company(resultSet.getString(2), resultSet.getString(3), resultSet.getString(4));
+					company.setCompanyId(resultSet.getLong(1));
+					companyList.add(company);
+				}while(resultSet.next()); 
+			}else {
+				throw new CouponSystemException(CouponSystemException.COMPANYS_NOT_EXISTS);
 			}
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
 			
@@ -248,7 +243,7 @@ public class CompanyDBDAO implements CompanyDAO {
 	}
 
 	@Override
-	public boolean login(String compName, String password) {
+	public boolean login(String compName, String password) throws CouponSystemException {
 		
 		Connection connection = connectionPool.getConnection();
 		PreparedStatement preparedStatement = null;
@@ -265,20 +260,18 @@ public class CompanyDBDAO implements CompanyDAO {
 			
 			result = preparedStatement.executeQuery();
 			if (result.next()) flag = true;
-			
+			return flag;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		} finally {
 			
 			SqlUtility.closeStatement(preparedStatement);
 			connectionPool.returnConnection(connection);
 		}
-		return flag;
 	}
 
 	@Override
-	public Company getCompanyByName(String name) {
+	public Company getCompanyByName(String name) throws CouponSystemException {
 		
 		Connection connection = connectionPool.getConnection();
 		Statement statement = null;
@@ -300,18 +293,15 @@ public class CompanyDBDAO implements CompanyDAO {
 				company.setEmail(result.getString(4));
 				
 			} else {
-				// TODO some kind of exception?
+				throw new CouponSystemException(CouponSystemException.COMPANY_NOT_EXISTS);
 			}
-			
+			return company;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		} finally {
 			
 			SqlUtility.closeStatement(statement);
 			connectionPool.returnConnection(connection);
 		}
-		
-		return company;
 	}
 }

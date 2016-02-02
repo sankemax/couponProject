@@ -15,7 +15,7 @@ public class CompanyFacade implements CouponClientFacade {
 	private CouponDAO couponDAO;
 	private CompanyDAO companyDAO;
 	
-	public CompanyFacade(){
+	public CompanyFacade() throws CouponSystemException{
 		
 		couponDAO = new CouponDBDAO();
 		companyDAO = new CompanyDBDAO();
@@ -34,19 +34,19 @@ public class CompanyFacade implements CouponClientFacade {
 		couponDAO.removeCoupon(coupon);
 	}
 	
-	public void updateCoupon(Coupon coupon) {
+	public void updateCoupon(Coupon coupon) throws CouponSystemException {
 		couponDAO.updateCoupon(coupon);
 	}
 	
-	public Coupon getCoupon(long id){
+	public Coupon getCoupon(long id) throws CouponSystemException{
 		return couponDAO.getCoupon(id);
 	}
 	
-	public List<Coupon> getAllCoupons(){
+	public List<Coupon> getAllCoupons() throws CouponSystemException{
 		return couponDAO.getAllCouponsCompany(company.getId());
 	}
 	
-	public List<Coupon> getCouponByType(CouponType type){
+	public List<Coupon> getCouponByType(CouponType type) throws CouponSystemException{
 		return couponDAO.getCouponsCompanyByType(company.getId(), type);
 	}
 	
@@ -61,7 +61,7 @@ public class CompanyFacade implements CouponClientFacade {
 		return this;
 	}
 	
-	public Company getCompanyByName(String name){
+	public Company getCompanyByName(String name) throws CouponSystemException{
 		return companyDAO.getCompanyByName(name.toLowerCase());
 	}
 }

@@ -8,16 +8,16 @@ import facade.CustomerFacade;
 
 public class CouponSystem {
 	
-	private static CouponSystem instance = new CouponSystem();
+	private static CouponSystem instance;
 	private DailyCouponExpirationTask dailyCouponExpirationTask; 
 	private ConnectionPool connectionPool;
 	private Thread maintenanceThread;
 	
-	private CouponSystem() {
+	private CouponSystem() throws CouponSystemException {
 		startCouponSystem();
 	}
 	
-	private void startCouponSystem() {
+	private void startCouponSystem() throws CouponSystemException {
 		
 		connectionPool = ConnectionPool.getInstance();
 		dailyCouponExpirationTask = new DailyCouponExpirationTask();
@@ -39,14 +39,17 @@ public class CouponSystem {
 		throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 	}
 	
-	public void shutdown() {
+	public void shutdown() throws CouponSystemException {
 		
 		dailyCouponExpirationTask.stopTask();
 		maintenanceThread.interrupt();
 		connectionPool.closeAllConnections();
 	}
 	
-	public static CouponSystem getInstance() {
+	public static CouponSystem getInstance() throws CouponSystemException {
+		if(instance == null){
+			instance = new CouponSystem();
+		}
 		return instance;
 	}
 

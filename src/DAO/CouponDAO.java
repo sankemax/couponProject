@@ -7,17 +7,17 @@ import core.CouponSystemException;
 
 public interface CouponDAO {
 	
-	public void createCoupon(long CompanyId, Coupon coupon);
+	public void createCoupon(long CompanyId, Coupon coupon) throws CouponSystemException;
 	public void removeCoupon(Coupon coupon) throws CouponSystemException;
-	public void updateCoupon(Coupon coupon);
-	public boolean isTitleExists(String title);
-	public Coupon getCoupon(long id);
+	public void updateCoupon(Coupon coupon) throws CouponSystemException;
+	public boolean isTitleExists(String title) throws CouponSystemException;
+	public Coupon getCoupon(long id) throws CouponSystemException;
 	public Coupon getCouponByTitle(String title) throws CouponSystemException;
-	public List<Coupon> getAllCoupons();
-	public List<Coupon> getAllCouponsCompany(long CompanyId);
-	public List<Coupon> getCouponsCompanyByType(long CompanyId, CouponType type);
-	public List<Coupon> getAllpurchasedCoupons(long customerId);
-	public List<Coupon> getAllpurchasedCouponByType(long customerId, CouponType type);
+	public List<Coupon> getAllCoupons() throws CouponSystemException;
+	public List<Coupon> getAllCouponsCompany(long CompanyId) throws CouponSystemException;
+	public List<Coupon> getCouponsCompanyByType(long CompanyId, CouponType type) throws CouponSystemException;
+	public List<Coupon> getAllpurchasedCoupons(long customerId) throws CouponSystemException;
+	public List<Coupon> getAllpurchasedCouponByType(long customerId, CouponType type) throws CouponSystemException;
 	public List<Coupon> getAllpurchasedCouponByPrice(long customerId, double price);
 
 }
