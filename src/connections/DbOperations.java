@@ -20,10 +20,6 @@ public class DbOperations {
 	public static final String driverName = "org.apache.derby.jdbc.ClientDriver"; 
 	public static final String tableInfoPath = "src/TABLES.txt";
 	
-	public static void main(String[] args) {	
-		createDbAndTables();
-	}
-	
 	public static void createDbAndTables() {
 		
 		File file = new File(tableInfoPath);

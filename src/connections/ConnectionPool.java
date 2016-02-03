@@ -44,7 +44,7 @@ public class ConnectionPool {
 	
 	// getter of the singleton instance ConnectionPool which holds 10 connections
 	public static ConnectionPool getInstance() throws CouponSystemException {
-		if(instance == null){
+		if (instance == null) {
 			instance = new ConnectionPool();
 		}
 		return instance;
