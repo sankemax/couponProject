@@ -13,7 +13,7 @@ public class CouponDBDAO implements CouponDAO {
 
 	private ConnectionPool connectionPool;
 	
-	public CouponDBDAO() {
+	public CouponDBDAO() throws CouponSystemException {
 		connectionPool = ConnectionPool.getInstance();
 	}
 	

@@ -5,10 +5,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import core.CouponSystemException;
+
 public class ConnectionPool {
 
 	// singleton instance
-	private static ConnectionPool instance = new ConnectionPool();
+	private static ConnectionPool instance; 
 	
 	// connection pool
 	private List<Connection> connections;
@@ -17,7 +19,7 @@ public class ConnectionPool {
 	private String url = DbOperations.dbUrl;
 	
 	// private constructor. part of the singleton design pattern
-	private ConnectionPool() {
+	private ConnectionPool() throws CouponSystemException {
 		
 		// initializing connection pool
 		connections = new ArrayList<>();
@@ -26,7 +28,7 @@ public class ConnectionPool {
 		try {
 			Class.forName(DbOperations.driverName);
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}
 		
 		// populating connection pool with active connections
@@ -35,13 +37,16 @@ public class ConnectionPool {
 			try {
 				 connections.add(DriverManager.getConnection(url));
 			} catch (SQLException e) {
-				// TODO create proper exception
+				throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			}
 		}
 	}
 	
 	// getter of the singleton instance ConnectionPool which holds 10 connections
-	public static ConnectionPool getInstance() {
+	public static ConnectionPool getInstance() throws CouponSystemException {
+		if(instance == null){
+			instance = new ConnectionPool();
+		}
 		return instance;
 	}
 	
@@ -54,7 +59,7 @@ public class ConnectionPool {
 				// if no connections available, wait till a connection returns to the pool
 				this.wait();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				System.out.println("Interrupted");
 			}
 		}
 
@@ -63,13 +68,12 @@ public class ConnectionPool {
 	
 	
 	// after a connection has been used it will be returned to connection pool
-	public synchronized void returnConnection(Connection con) {
+	public synchronized void returnConnection(Connection con) throws CouponSystemException {
 		
 		try {
 			con.setAutoCommit(true);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}
 		
 		connections.add(con);
@@ -78,7 +82,7 @@ public class ConnectionPool {
 	
 	// a method that closes all connections. in case the connections are being used
 	// it will wait till the moment they are freed
-	public synchronized void closeAllConnections() {
+	public synchronized void closeAllConnections() throws CouponSystemException {
 		
 		for (int i = 0; i < 10; i++) {
 			
@@ -87,14 +91,14 @@ public class ConnectionPool {
 				try {
 					this.wait();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
+					System.out.println("Interrupted");
 				}
 			}
 			Connection con = connections.remove(0);
 			try {
 				con.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
+				throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			}
 		}
 	}

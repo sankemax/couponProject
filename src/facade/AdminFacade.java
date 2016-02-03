@@ -15,7 +15,7 @@ public class AdminFacade implements CouponClientFacade{
 	private CustomerDAO customerDAO;
 	private CompanyDAO companyDAO;
 	
-	public AdminFacade(){
+	public AdminFacade() throws CouponSystemException{
 		customerDAO = new CustomerDBDAO();
 		companyDAO = new CompanyDBDAO();
 	}

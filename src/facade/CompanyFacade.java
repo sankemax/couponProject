@@ -15,7 +15,7 @@ public class CompanyFacade implements CouponClientFacade {
 	private CouponDAO couponDAO;
 	private CompanyDAO companyDAO;
 	
-	public CompanyFacade(){
+	public CompanyFacade() throws CouponSystemException{
 		
 		couponDAO = new CouponDBDAO();
 		companyDAO = new CompanyDBDAO();
