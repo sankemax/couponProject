@@ -9,6 +9,7 @@ import java.util.List;
 
 import beans.Coupon;
 import beans.CouponType;
+import core.CouponSystemException;
 
 public class SqlUtility {
 
@@ -60,27 +61,28 @@ public class SqlUtility {
 		}
 	}
 	
-	public static List<Coupon> createCoupons(ResultSet resultSet){
+	public static List<Coupon> createCoupons(ResultSet resultSet) throws CouponSystemException{
 		List<Coupon> couponList = new ArrayList<Coupon>();
 		
 		try {
-			while (resultSet.next()) {
-				
-				Coupon coupon = new Coupon(resultSet.getString(2), 
-						new java.util.Date(resultSet.getDate(3).getTime()), 
-						new java.util.Date(resultSet.getDate(4).getTime()),
-						resultSet.getInt(5),
-						CouponType.valueOf(resultSet.getString(6)),
-						resultSet.getString(7),
-						resultSet.getDouble(8),
-						resultSet.getString(9));
-				coupon.setCouponId(resultSet.getLong(1));
-				couponList.add(coupon);
+			if(resultSet.next()){
+				do{
+					Coupon coupon = new Coupon(resultSet.getString(2), 
+							new java.util.Date(resultSet.getDate(3).getTime()), 
+							new java.util.Date(resultSet.getDate(4).getTime()),
+							resultSet.getInt(5),
+							CouponType.valueOf(resultSet.getString(6)),
+							resultSet.getString(7),
+							resultSet.getDouble(8),
+							resultSet.getString(9));
+					coupon.setCouponId(resultSet.getLong(1));
+					couponList.add(coupon);
+				}while (resultSet.next());
+			}else {
+				throw new CouponSystemException(CouponSystemException.COUPONS_NOT_EXISTS);
 			}
-			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}
 		return couponList;
 	}

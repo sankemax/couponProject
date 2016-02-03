@@ -16,7 +16,7 @@ public class CustomerFacade implements CouponClientFacade {
 	private CustomerDAO customerDAO;
 	private CouponDAO couponDAO;
 	
-	public CustomerFacade(){
+	public CustomerFacade() throws CouponSystemException{
 		customerDAO = new CustomerDBDAO();
 		couponDAO = new CouponDBDAO();
 	}
@@ -45,12 +45,12 @@ public class CustomerFacade implements CouponClientFacade {
 		customerDAO.purchaseCoupon(customer.getId(), coupon.getId());
 	}
 	
-	public List<Coupon> getAllpurchasedCoupons(){
+	public List<Coupon> getAllpurchasedCoupons() throws CouponSystemException{
 		return couponDAO.getAllpurchasedCoupons(customer.getId());
 
 	}
 	
-	public List<Coupon> getAllpurchasedCouponByType(CouponType type){
+	public List<Coupon> getAllpurchasedCouponByType(CouponType type) throws CouponSystemException{
 		return couponDAO.getAllpurchasedCouponByType(customer.getId(), type);
 	}
 	
@@ -68,7 +68,7 @@ public class CustomerFacade implements CouponClientFacade {
 		return this;
 	}
 
-	public Customer getCustomerByName(String name){
+	public Customer getCustomerByName(String name) throws CouponSystemException{
 		return customerDAO.getCustomerByName(name.toLowerCase());
 	}
 }

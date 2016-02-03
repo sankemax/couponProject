@@ -13,12 +13,12 @@ public class CouponDBDAO implements CouponDAO {
 
 	private ConnectionPool connectionPool;
 	
-	public CouponDBDAO() {
+	public CouponDBDAO() throws CouponSystemException {
 		connectionPool = ConnectionPool.getInstance();
 	}
 	
 	@Override
-	public void createCoupon(long CompanyId, Coupon coupon) {
+	public void createCoupon(long CompanyId, Coupon coupon) throws CouponSystemException {
 		
 		Connection connection = connectionPool.getConnection();
 		
@@ -61,9 +61,8 @@ public class CouponDBDAO implements CouponDAO {
 			connection.commit();
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 			SqlUtility.rollbackConnection(connection);
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
 			
@@ -107,7 +106,6 @@ public class CouponDBDAO implements CouponDAO {
 			
 		} catch (SQLException e) {
 			SqlUtility.rollbackConnection(connection);
-			e.printStackTrace(); // TODO for now
 			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
@@ -118,7 +116,7 @@ public class CouponDBDAO implements CouponDAO {
 	}
 
 	@Override
-	public void updateCoupon(Coupon coupon) {
+	public void updateCoupon(Coupon coupon) throws CouponSystemException {
 
 		Connection connection = connectionPool.getConnection();
 		PreparedStatement preparedSt = null;
@@ -131,12 +129,12 @@ public class CouponDBDAO implements CouponDAO {
 			preparedSt.setDate(1, new java.sql.Date(coupon.getEndDate().getTime()));
 			preparedSt.setDouble(2, coupon.getPrice());
 			preparedSt.setLong(3, coupon.getId());
-			preparedSt.executeUpdate();
+			if (!preparedSt.execute()){
+				throw new CouponSystemException(CouponSystemException.COUPON_NOT_EXIST_ERROR);
+			}
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		} finally {
 			
 			SqlUtility.closeStatement(preparedSt);
@@ -145,7 +143,7 @@ public class CouponDBDAO implements CouponDAO {
 	}
 
 	@Override
-	public boolean isTitleExists(String title) {
+	public boolean isTitleExists(String title) throws CouponSystemException {
 		
 		Connection connection = connectionPool.getConnection();
 		String sql = "SELECT coupon.title FROM coupon WHERE coupon.title = '" + title + "' FETCH FIRST ROW ONLY";
@@ -158,22 +156,19 @@ public class CouponDBDAO implements CouponDAO {
 			statement = connection.createStatement();
 			result = statement.executeQuery(sql);
 			if (result.next()) flag = true;
-			
+			return flag;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		} finally {
 			
 			SqlUtility.closeStatement(statement);
 			SqlUtility.closeResultSet(result);
 			connectionPool.returnConnection(connection);
 		}
-		return flag;
 	}
 
 	@Override
-	public Coupon getCoupon(long id) {
+	public Coupon getCoupon(long id) throws CouponSystemException {
 		
 		String sql = null;
 		Coupon coupon = null;
@@ -197,14 +192,13 @@ public class CouponDBDAO implements CouponDAO {
 						result.getDouble(8), 
 						result.getString(9));
 				coupon.setCouponId(id);
-				
+				return coupon;
 			} else {
-				// TODO throw ecxeption
+				throw new CouponSystemException(CouponSystemException.COUPON_NOT_EXIST_ERROR);
 			}
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
 			
@@ -212,11 +206,10 @@ public class CouponDBDAO implements CouponDAO {
 			SqlUtility.closeResultSet(result);
 			connectionPool.returnConnection(connection);
 		}
-		return coupon;
 	}
 
 	@Override
-	public List<Coupon> getAllCoupons() {
+	public List<Coupon> getAllCoupons() throws CouponSystemException {
 		
 		Connection connection = connectionPool.getConnection();
 		Statement statement = null;
@@ -230,22 +223,19 @@ public class CouponDBDAO implements CouponDAO {
 			resultSet = statement.executeQuery(sql);
 			
 			couponList = SqlUtility.createCoupons(resultSet);
-			
+			return couponList;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
-			
 			SqlUtility.closeStatement(statement);
 			SqlUtility.closeResultSet(resultSet);
 			connectionPool.returnConnection(connection);
 		}
-		return couponList;
 	}
 
 	@Override
-	public List<Coupon> getAllCouponsCompany(long companyId) {
+	public List<Coupon> getAllCouponsCompany(long companyId) throws CouponSystemException {
 
 		Connection connection = connectionPool.getConnection();
 		PreparedStatement preparedStatement = null;
@@ -260,21 +250,19 @@ public class CouponDBDAO implements CouponDAO {
 			resultSet = preparedStatement.executeQuery();
 			
 			couponList = SqlUtility.createCoupons(resultSet);
-			
+			return couponList;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		} finally {
 			
 			SqlUtility.closeStatement(preparedStatement);
 			SqlUtility.closeResultSet(resultSet);
 			connectionPool.returnConnection(connection);
 		}
-		return couponList;
 	}
 
 	@Override
-	public List<Coupon> getCouponsCompanyByType(long companyId, CouponType type) {
+	public List<Coupon> getCouponsCompanyByType(long companyId, CouponType type) throws CouponSystemException {
 
 		Connection connection = connectionPool.getConnection();
 		PreparedStatement preparedStatement = null;
@@ -290,21 +278,19 @@ public class CouponDBDAO implements CouponDAO {
 			resultSet = preparedStatement.executeQuery();
 			
 			couponList = SqlUtility.createCoupons(resultSet);
-			
+			return couponList;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		} finally {
 			
 			SqlUtility.closeStatement(preparedStatement);
 			SqlUtility.closeResultSet(resultSet);
 			connectionPool.returnConnection(connection);
 		}
-		return couponList;
 	}
 
 	@Override
-	public List<Coupon> getAllpurchasedCoupons(long customerId) {
+	public List<Coupon> getAllpurchasedCoupons(long customerId) throws CouponSystemException {
 
 		Connection connection = connectionPool.getConnection();
 		PreparedStatement preparedStatement = null;
@@ -319,21 +305,19 @@ public class CouponDBDAO implements CouponDAO {
 			resultSet = preparedStatement.executeQuery();
 			
 			couponList = SqlUtility.createCoupons(resultSet);
-			
+			return couponList;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		} finally {
 			
 			SqlUtility.closeStatement(preparedStatement);
 			SqlUtility.closeResultSet(resultSet);
 			connectionPool.returnConnection(connection);
 		}
-		return couponList;
 	}
 
 	@Override
-	public List<Coupon> getAllpurchasedCouponByType(long customerId, CouponType type) {
+	public List<Coupon> getAllpurchasedCouponByType(long customerId, CouponType type) throws CouponSystemException {
 
 		Connection connection = connectionPool.getConnection();
 		PreparedStatement preparedStatement = null;
@@ -349,17 +333,15 @@ public class CouponDBDAO implements CouponDAO {
 			resultSet = preparedStatement.executeQuery();
 			
 			couponList = SqlUtility.createCoupons(resultSet);
-			
+			return couponList;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		} finally {
 			
 			SqlUtility.closeStatement(preparedStatement);
 			SqlUtility.closeResultSet(resultSet);
 			connectionPool.returnConnection(connection);
 		}
-		return couponList;
 	}
 
 	@Override
@@ -393,22 +375,16 @@ public class CouponDBDAO implements CouponDAO {
 						result.getString(9));
 				coupon.setCouponId(result.getLong(1));
 			} else {
-				
 				throw new CouponSystemException(CouponSystemException.COUPON_NOT_EXIST_ERROR);
 			}
-			
+			return coupon;
 		} catch (SQLException e) {
-			
-			e.printStackTrace(); // TODO for now
 			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
-			
 		} finally {
-			
 			SqlUtility.closeStatement(statement);
 			SqlUtility.closeResultSet(result);
 			connectionPool.returnConnection(connection);
 		}
-		return coupon;
 	}
 
 }

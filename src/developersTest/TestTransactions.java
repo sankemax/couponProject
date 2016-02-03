@@ -17,10 +17,10 @@ public class TestTransactions {
 
 	public static void main(String[] args) {
 		DbOperations.main(null);
-		CouponSystem couponSystem = CouponSystem.getInstance();
+		
 		
 		try {
-			
+			CouponSystem couponSystem = CouponSystem.getInstance();
 			AdminFacade ad = (AdminFacade) couponSystem.login("admin", "1234", ClientType.ADMIN);
 			
 			Company company = new Company("tryonics", "bigboss123", "this@is.sparta");

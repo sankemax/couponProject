@@ -15,7 +15,7 @@ public class AdminFacade implements CouponClientFacade{
 	private CustomerDAO customerDAO;
 	private CompanyDAO companyDAO;
 	
-	public AdminFacade(){
+	public AdminFacade() throws CouponSystemException{
 		customerDAO = new CustomerDBDAO();
 		companyDAO = new CompanyDBDAO();
 	}
@@ -29,19 +29,19 @@ public class AdminFacade implements CouponClientFacade{
 		companyDAO.createCompany(company);
 	}
 	
-	public void removeCompany(Company company){
+	public void removeCompany(Company company) throws CouponSystemException{
 		companyDAO.removeCompany(company);
 	}
 
-	public void updateCompany(Company company){
+	public void updateCompany(Company company) throws CouponSystemException{
 		companyDAO.updateCompany(company);
 	}
 	
-	public Company getCompany(long id){
+	public Company getCompany(long id) throws CouponSystemException{
 			return companyDAO.getCompany(id);
 	}
 	
-	public List<Company> getAllCompanies(){
+	public List<Company> getAllCompanies() throws CouponSystemException{
 		return companyDAO.getAllCompanies();
 	}
 	
@@ -56,20 +56,20 @@ public class AdminFacade implements CouponClientFacade{
 
 	}
 	
-	public void removeCustomer(Customer customer){
+	public void removeCustomer(Customer customer) throws CouponSystemException{
 			customerDAO.removeCustomer(customer);
 	}
 	
-	public void updateCustomer(Customer customer){
+	public void updateCustomer(Customer customer) throws CouponSystemException{
 		customerDAO.updateCustomer(customer);
 
 	}
 	
-	public Customer getCustomer(long id){
+	public Customer getCustomer(long id) throws CouponSystemException{
 		return customerDAO.getCustomer(id);
 	}
 	
-	public List<Customer> getAllCustomer(){
+	public List<Customer> getAllCustomer() throws CouponSystemException{
 		return customerDAO.getAllCustomer();
 	}
 	

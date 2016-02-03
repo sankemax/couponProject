@@ -15,9 +15,14 @@ import core.CouponSystemException;
 
 public class CustomerDBDAO implements CustomerDAO {
 	
-	ConnectionPool pool = ConnectionPool.getInstance();
+	ConnectionPool pool;
+	
+	public CustomerDBDAO() {
+		pool = ConnectionPool.getInstance();
+	}
+	
 	@Override
-	public void createCustomer(Customer customer) {
+	public void createCustomer(Customer customer) throws CouponSystemException {
 		
 		Connection connection = pool.getConnection();
 		String sql = "INSERT INTO Customer (CUST_NAME, PASSWORD) VALUES(?,?)";
@@ -32,17 +37,16 @@ public class CustomerDBDAO implements CustomerDAO {
 				rs = ps.getGeneratedKeys();
 				rs.next();
 				customer.setId(rs.getLong(1));
-				rs.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			}finally {
+				SqlUtility.closeResultSet(rs);
 				pool.returnConnection(connection);
 			}
 	}
 
 	@Override
-	public void removeCustomer(Customer customer) {
+	public void removeCustomer(Customer customer) throws CouponSystemException {
 		
 		Connection connection = pool.getConnection();
 		String sql1 = "DELETE FROM Customer_Coupon  WHERE CUST_ID =" + customer.getId();
@@ -59,15 +63,14 @@ public class CustomerDBDAO implements CustomerDAO {
 			
 		} catch (SQLException e) {
 			SqlUtility.rollbackConnection(connection);
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}finally {
 			pool.returnConnection(connection);
 		}
 	}
 
 	@Override
-	public void updateCustomer(Customer customer) {
+	public void updateCustomer(Customer customer) throws CouponSystemException {
 		
 		
 		Connection connection = pool.getConnection();
@@ -79,24 +82,23 @@ public class CustomerDBDAO implements CustomerDAO {
 			ps.setString(1, customer.getPassword());
 			ps.setLong(2, customer.getId());
 			if (!ps.execute()){
-				// TODO  the execute will always return false because there is no resultSet object so what is the purpose of this check?
+				throw new CouponSystemException(CouponSystemException.CUSTOMER_NOT_EXISTS);
 			}
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}finally {
 			pool.returnConnection(connection);
 		}
 	}
 
 	@Override
-	public Customer getCustomer(long id) {
+	public Customer getCustomer(long id) throws CouponSystemException {
 		
 		Connection connection = pool.getConnection();
 		String sql = "SELECT * FROM Customer WHERE ID = " + id + "FETCH FIRST ROW ONLY";
 		
-		ResultSet rs;
+		ResultSet rs = null;
 		Customer customer = null ;
 		
 		try(Statement st = connection.createStatement();) {
@@ -107,53 +109,53 @@ public class CustomerDBDAO implements CustomerDAO {
 				customer = new Customer(rs.getString(2), rs.getString(3));
 				customer.setId(rs.getLong(1));
 			}else{
-				// TODO ����� �����: �.�. �� ���� ������
+				throw new CouponSystemException(CouponSystemException.CUSTOMER_NOT_EXISTS);
 			}
-			rs.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}finally {
+			SqlUtility.closeResultSet(rs);
 			pool.returnConnection(connection);
 		}
 		return customer;
 	}
 
 	@Override
-	public List<Customer> getAllCustomer() {
+	public List<Customer> getAllCustomer() throws CouponSystemException {
 		Connection connection = pool.getConnection();
 		String sql = "SELECT * FROM Customer";
 		
-		ResultSet rs;
+		ResultSet rs = null;
 		List<Customer> customers = new ArrayList<>();
 		
 		try(Statement st = connection.createStatement();) {
 			
 			rs = st.executeQuery(sql);
-			
-			while(rs.next()){
-				Customer customer = new Customer(rs.getString(2), rs.getString(3));
-				customer.setId(rs.getLong(1));
-				customers.add(customer);
-				
+			if(rs.next()){
+				do{
+					Customer customer = new Customer(rs.getString(2), rs.getString(3));
+					customer.setId(rs.getLong(1));
+					customers.add(customer);
+				}while(rs.next());
+			}else {
+				throw new CouponSystemException(CouponSystemException.CUSTOMERS_NOT_EXISTS);
 			}
-			rs.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}finally {
+			SqlUtility.closeResultSet(rs);
 			pool.returnConnection(connection);
 		}
 		return customers;
 	}
 
 	@Override
-	public Customer getCustomerByName(String name) {
+	public Customer getCustomerByName(String name) throws CouponSystemException {
 		
 		Connection connection = pool.getConnection();
 		String sql = "SELECT * FROM Customer WHERE CUST_NAME = '" + name + "'FETCH FIRST ROW ONLY";
 		
-		ResultSet rs;
+		ResultSet rs = null;
 		Customer customer = null ;
 		
 		try(Statement st = connection.createStatement();){
@@ -164,24 +166,23 @@ public class CustomerDBDAO implements CustomerDAO {
 				customer = new Customer(rs.getString(2), rs.getString(3));
 				customer.setId(rs.getLong(1));
 			}else{
-				// TODO ����� �����: �� �� ���� ������
+				throw new CouponSystemException(CouponSystemException.CUSTOMER_NOT_EXISTS);
 			}
-			rs.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}finally {
+			SqlUtility.closeResultSet(rs);
 			pool.returnConnection(connection);
 		}
 		return customer;
 	}
 
 	@Override
-	public boolean isNameExists(Customer customer) {
+	public boolean isNameExists(Customer customer) throws CouponSystemException {
 		
 		Connection connection = pool.getConnection();
 		String sql = "SELECT * FROM Customer WHERE CUST_NAME = '" +customer.getCustName()+ "'FETCH FIRST ROW ONLY";
-		ResultSet rs;
+		ResultSet rs = null;
 		boolean flag = false;
 		
 		try(Statement st = connection.createStatement();){
@@ -191,22 +192,23 @@ public class CustomerDBDAO implements CustomerDAO {
 			if(rs.next()){
 				flag = true;
 			}
-			rs.close();
+			
+			return flag;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}finally {
+			SqlUtility.closeResultSet(rs);
 			pool.returnConnection(connection);
 		}
-		return flag;
+		
 	}
 	
 	@Override
-	public boolean isPurchased(long customerId, long couponId) {
+	public boolean isPurchased(long customerId, long couponId) throws CouponSystemException {
 		
 		Connection connection = pool.getConnection();
 		String sql = "SELECT * FROM Customer_Coupon WHERE CUST_ID = ? AND COUPON_ID = ? FETCH FIRST ROW ONLY";
-		ResultSet rs;
+		ResultSet rs = null;
 		boolean flag = false;
 			
 		try(PreparedStatement ps = connection.prepareStatement(sql);){
@@ -218,15 +220,14 @@ public class CustomerDBDAO implements CustomerDAO {
 			if(rs.next()){
 				flag = true;
 			}
-			rs.close();
 			
+			return flag;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}finally {
+			SqlUtility.closeResultSet(rs);
 			pool.returnConnection(connection);
 		}
-		return flag;
 	}
 
 	@Override
@@ -249,10 +250,8 @@ public class CustomerDBDAO implements CustomerDAO {
 			connection.commit();
 		
 		} catch (SQLException e) {
-			
 			SqlUtility.rollbackConnection(connection);
 			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
-			
 		} finally {
 			
 			pool.returnConnection(connection);
@@ -264,23 +263,22 @@ public class CustomerDBDAO implements CustomerDAO {
 		
 		Connection connection = pool.getConnection();
 		
-		String sql = "SELECT customer.id FROM customer WHERE customer.cust_name = '" + customerName + "' AND customer.password = '" + password + "' FETCH FIRST ROW ONLY";
+		String sql = "SELECT customer.id FROM customer WHERE customer.cust_name = ? AND customer.password = ? FETCH FIRST ROW ONLY";
 		boolean flag = false;
-		
-		try (Statement st= connection.createStatement(); 
-				ResultSet rs = st.executeQuery(sql);){
+		ResultSet rs = null;
+		try (PreparedStatement ps= connection.prepareStatement(sql)){
+			ps.setString(1, customerName);
+			ps.setString(2, password);
+			rs = ps.executeQuery();
 			
 			if(rs.next()) flag = true;
-			
+			return flag;
 		} catch (SQLException e) {
-		
-			e.printStackTrace(); // TODO for now
 			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
-			
 		} finally {
-			
+			SqlUtility.closeResultSet(rs);
 			pool.returnConnection(connection);
 		}
-		return flag;
+		
 	}
 }

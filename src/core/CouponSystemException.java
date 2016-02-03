@@ -15,6 +15,11 @@ public class CouponSystemException extends Exception {
 	public static final String COUPON_EXPIRATION_DATE_PASSED = "coupon expiration date has passed";
 	public static final String COUPON_OUT_OF_STOCK = "this coupon is out of stock";
 	public static final String COUPON_ALREADY_PURCHASED = "you have already purchased this coupon";
+	public static final String CUSTOMER_NOT_EXISTS  = "customer does not exist";
+	public static final String COMPANY_NOT_EXISTS  = "company does not exist";
+	public static final String CUSTOMERS_NOT_EXISTS  = "No customers system";
+	public static final String COMPANYS_NOT_EXISTS  = "No companys system";
+	public static final String COUPONS_NOT_EXISTS  = "No coupons system";
 	
 	public CouponSystemException(String message){
 		super(message); 
