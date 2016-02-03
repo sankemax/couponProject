@@ -17,7 +17,7 @@ public class DailyCouponExpirationTask implements Runnable {
 	// TODO only temporal for testing
 	private static final long TESTING = 10_000; 
 	
-	public DailyCouponExpirationTask() {
+	public DailyCouponExpirationTask() throws CouponSystemException {
 		
 		couponDAO = new CouponDBDAO();
 		quit = false;
@@ -26,35 +26,33 @@ public class DailyCouponExpirationTask implements Runnable {
 	@Override
 	public void run() {
 		
+		// TODO set the thread to daemon and check that it works
 //		Thread.currentThread().setDaemon(true);		
 		while (! quit) {
+			try {
 			
-			Calendar calendar = Calendar.getInstance();
-			calendar.set(Calendar.HOUR_OF_DAY, 0);
-			calendar.set(Calendar.MINUTE, 0);
-			calendar.set(Calendar.SECOND, 0);
-			calendar.set(Calendar.MILLISECOND, 0);
-			Date today = calendar.getTime();
-			
-			Collection<Coupon> coupons = couponDAO.getAllCoupons();
-			for (Coupon coupon : coupons) {
+				Calendar calendar = Calendar.getInstance();
+				calendar.set(Calendar.HOUR_OF_DAY, 0);
+				calendar.set(Calendar.MINUTE, 0);
+				calendar.set(Calendar.SECOND, 0);
+				calendar.set(Calendar.MILLISECOND, 0);
+				Date today = calendar.getTime();
 				
-				if (coupon.getEndDate().before(today)) {
+				Collection<Coupon> coupons = couponDAO.getAllCoupons();
+				for (Coupon coupon : coupons) {
 					
-					try {
+					if (coupon.getEndDate().before(today)) {
+						
 						couponDAO.removeCoupon(coupon);
-					} catch (CouponSystemException e) {
-						// TODO this is not an error that the user gets... internal error. what to do?
-						e.printStackTrace();
 					}
 				}
-			}
-			
-			try {
-//				Thread.sleep(MILLI_SEC_IN_DAY);
-				Thread.sleep(TESTING);
+				
+	//				Thread.sleep(MILLI_SEC_IN_DAY);
+					Thread.sleep(TESTING);
 			} catch (InterruptedException e) {
 				break;
+			} catch (CouponSystemException e) {
+				// TODO what should we do?
 			}
 		}
 	}

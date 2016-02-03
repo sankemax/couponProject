@@ -17,7 +17,7 @@ public class CustomerDBDAO implements CustomerDAO {
 	
 	ConnectionPool pool;
 	
-	public CustomerDBDAO() {
+	public CustomerDBDAO() throws CouponSystemException {
 		pool = ConnectionPool.getInstance();
 	}
 	
@@ -74,14 +74,15 @@ public class CustomerDBDAO implements CustomerDAO {
 		
 		
 		Connection connection = pool.getConnection();
-		String sql = "UPDATE Customer SET PASSWORD = ? WHERE ID = ? ";
+		String sql = "UPDATE customer SET customer.password = ? WHERE customer.id = ?";
 		
 		
 		try(PreparedStatement ps = connection.prepareStatement(sql);) {
 			
 			ps.setString(1, customer.getPassword());
 			ps.setLong(2, customer.getId());
-			if (!ps.execute()){
+			
+			if(ps.executeUpdate() == 0) {
 				throw new CouponSystemException(CouponSystemException.CUSTOMER_NOT_EXISTS);
 			}
 			
