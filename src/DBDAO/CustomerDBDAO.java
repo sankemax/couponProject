@@ -17,7 +17,7 @@ public class CustomerDBDAO implements CustomerDAO {
 	
 	ConnectionPool pool;
 	
-	public CustomerDBDAO() throws CouponSystemException {
+	public CustomerDBDAO() {
 		pool = ConnectionPool.getInstance();
 	}
 	
