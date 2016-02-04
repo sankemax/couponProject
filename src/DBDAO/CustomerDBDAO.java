@@ -48,9 +48,12 @@ public class CustomerDBDAO implements CustomerDAO {
 	@Override
 	public void removeCustomer(Customer customer) throws CouponSystemException {
 		
+		// this line of code is needed only for the first step demonstration
+		customer.setId(getCustomerByName(customer.getCustName()).getId());
+		
 		Connection connection = pool.getConnection();
-		String sql1 = "DELETE FROM Customer_Coupon  WHERE CUST_ID =" + customer.getId();
-		String sql2 = "DELETE FROM Customer  WHERE ID =" + customer.getId();
+		String sql1 = "DELETE FROM customer_coupon  WHERE cust_id =" + customer.getId();
+		String sql2 = "DELETE FROM customer  WHERE id =" + customer.getId();
 		
 		
 		try(Statement st = connection.createStatement();){
@@ -72,10 +75,11 @@ public class CustomerDBDAO implements CustomerDAO {
 	@Override
 	public void updateCustomer(Customer customer) throws CouponSystemException {
 		
-		
+		// this line of code is needed only for the first step demonstration
+		customer.setId(getCustomerByName(customer.getCustName()).getId());
+
 		Connection connection = pool.getConnection();
 		String sql = "UPDATE customer SET customer.password = ? WHERE customer.id = ?";
-		
 		
 		try(PreparedStatement ps = connection.prepareStatement(sql);) {
 			
