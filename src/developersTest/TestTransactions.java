@@ -47,7 +47,10 @@ public class TestTransactions {
 			System.out.println(cf.getAllCoupons());
 //			customer2.setPassword("smallAnt");
 //			ad.updateCustomer(customer2);
-			ad.removeCustomer(customer2);
+//			ad.removeCustomer(customer2);
+//			company.setEmail("sparta@is-no.more");
+//			ad.updateCompany(company);
+//			ad.removeCompany(company);
 			
 		} catch (CouponSystemException e) {
 			e.printStackTrace();

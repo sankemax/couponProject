@@ -83,6 +83,9 @@ public class CouponDBDAO implements CouponDAO {
 			
 			connection.setAutoCommit(false);
 			
+			// the next line is for demonstration of the first stage of the project only
+			coupon.setCouponId(getCouponByTitle(coupon.getTitle()).getId());
+			
 			long couponId = coupon.getId();
 			
 			sql = "DELETE FROM customer_coupon WHERE coupon_id = ?";
