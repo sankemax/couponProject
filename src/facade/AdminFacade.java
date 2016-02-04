@@ -41,6 +41,10 @@ public class AdminFacade implements CouponClientFacade{
 			return companyDAO.getCompany(id);
 	}
 	
+	public Company getCompanyByName(String name) throws CouponSystemException{
+		return companyDAO.getCompanyByName(name.toLowerCase());
+	}
+	
 	public List<Company> getAllCompanies() throws CouponSystemException{
 		return companyDAO.getAllCompanies();
 	}

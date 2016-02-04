@@ -136,13 +136,13 @@ public class CustomerDBDAO implements CustomerDAO {
 		try(Statement st = connection.createStatement();) {
 			
 			rs = st.executeQuery(sql);
-			if(rs.next()){
+			if(rs.next()) {
 				do{
 					Customer customer = new Customer(rs.getString(2), rs.getString(3));
 					customer.setId(rs.getLong(1));
 					customers.add(customer);
-				}while(rs.next());
-			}else {
+				} while(rs.next());
+			} else {
 				throw new CouponSystemException(CouponSystemException.CUSTOMERS_NOT_EXISTS);
 			}
 		} catch (SQLException e) {

@@ -124,15 +124,22 @@ public class CouponDBDAO implements CouponDAO {
 		Connection connection = connectionPool.getConnection();
 		PreparedStatement preparedSt = null;
 		
+		// the next line exists for the purpose of correct run while presenting stage 1 of the project
+		coupon.setCouponId(getCouponByTitle(coupon.getTitle()).getId());
+		
 		try {
 			
-			String sql = "UPDATE coupon SET end_date = ?, price = ?, WHERE id = ?";
+			String sql = "UPDATE coupon SET end_date = ?, price = ?, image = ?, message = ?, coupon_type = ? WHERE id = ?";
 			
 			preparedSt = connection.prepareStatement(sql);
 			preparedSt.setDate(1, new java.sql.Date(coupon.getEndDate().getTime()));
 			preparedSt.setDouble(2, coupon.getPrice());
-			preparedSt.setLong(3, coupon.getId());
-			if (!preparedSt.execute()){
+			preparedSt.setString(3, coupon.getImage());
+			preparedSt.setString(4, coupon.getMessage());
+			preparedSt.setString(5, coupon.getType().toString());
+			preparedSt.setLong(6, coupon.getId());
+			
+			if (preparedSt.executeUpdate() == 0) {
 				throw new CouponSystemException(CouponSystemException.COUPON_NOT_EXIST_ERROR);
 			}
 			
@@ -337,6 +344,7 @@ public class CouponDBDAO implements CouponDAO {
 			
 			couponList = SqlUtility.createCoupons(resultSet);
 			return couponList;
+
 		} catch (SQLException e) {
 			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		} finally {
@@ -347,11 +355,6 @@ public class CouponDBDAO implements CouponDAO {
 		}
 	}
 
-	@Override
-	public List<Coupon> getAllpurchasedCouponByPrice(long customerId, double price) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public Coupon getCouponByTitle(String title) throws CouponSystemException {
@@ -386,6 +389,66 @@ public class CouponDBDAO implements CouponDAO {
 		} finally {
 			SqlUtility.closeStatement(statement);
 			SqlUtility.closeResultSet(result);
+			connectionPool.returnConnection(connection);
+		}
+	}
+
+	// for customers
+	@Override
+	public List<Coupon> getAllpurchasedCouponByPrice(long customerId, double price) throws CouponSystemException {
+		
+		Connection connection = connectionPool.getConnection();
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
+		String sql = "SELECT id, title, start_date, end_date, amount, coupon_type, message, price, image FROM coupon cu INNER JOIN customer_coupon cucu ON cu.id = cucu.coupon_id WHERE cucu.cust_id = ? AND cu.price <= ?";
+		List<Coupon> couponList = null;
+		
+		try {
+			
+			preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setLong(1, customerId);
+			preparedStatement.setDouble(2, price);
+			resultSet = preparedStatement.executeQuery();
+			
+			couponList = SqlUtility.createCoupons(resultSet);
+			return couponList;
+			
+		} catch (SQLException e) {
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
+		} finally {
+			
+			SqlUtility.closeStatement(preparedStatement);
+			SqlUtility.closeResultSet(resultSet);
+			connectionPool.returnConnection(connection);
+		}
+	}
+	
+	// for companies or admin
+	@Override
+	public List<Coupon> getCouponsCompanyByPrice(long companyId, double price) throws CouponSystemException {
+
+		Connection connection = connectionPool.getConnection();
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
+		String sql = "SELECT id, title, start_date, end_date, amount, coupon_type, message, price, image FROM coupon cu INNER JOIN company_coupon compcu ON cu.id = compcu.coupon_id WHERE compcu.comp_id = ? AND cu.price <= ?";
+		List<Coupon> couponList = null;
+		
+		try {
+			
+			preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setLong(1, companyId);
+			preparedStatement.setDouble(2, price);
+			resultSet = preparedStatement.executeQuery();
+			
+			couponList = SqlUtility.createCoupons(resultSet);
+			return couponList;
+			
+		} catch (SQLException e) {
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
+		} finally {
+			
+			SqlUtility.closeStatement(preparedStatement);
+			SqlUtility.closeResultSet(resultSet);
 			connectionPool.returnConnection(connection);
 		}
 	}

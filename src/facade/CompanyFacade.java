@@ -38,8 +38,12 @@ public class CompanyFacade implements CouponClientFacade {
 		couponDAO.updateCoupon(coupon);
 	}
 	
-	public Coupon getCoupon(long id) throws CouponSystemException{
+	public Coupon getCoupon(long id) throws CouponSystemException {
 		return couponDAO.getCoupon(id);
+	}
+
+	public Coupon getCouponByTitle(String title) throws CouponSystemException {
+		return couponDAO.getCouponByTitle(title);
 	}
 	
 	public List<Coupon> getAllCoupons() throws CouponSystemException{
@@ -48,6 +52,10 @@ public class CompanyFacade implements CouponClientFacade {
 	
 	public List<Coupon> getCouponByType(CouponType type) throws CouponSystemException{
 		return couponDAO.getCouponsCompanyByType(company.getId(), type);
+	}
+
+	public List<Coupon> getCouponByPrice(double price) throws CouponSystemException{
+		return couponDAO.getCouponsCompanyByPrice(company.getId(), price);
 	}
 	
 	@Override
@@ -59,9 +67,5 @@ public class CompanyFacade implements CouponClientFacade {
 		}
 		company = companyDAO.getCompanyByName(name);
 		return this;
-	}
-	
-	public Company getCompanyByName(String name) throws CouponSystemException{
-		return companyDAO.getCompanyByName(name.toLowerCase());
 	}
 }

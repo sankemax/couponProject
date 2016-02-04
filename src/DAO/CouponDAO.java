@@ -16,8 +16,9 @@ public interface CouponDAO {
 	public List<Coupon> getAllCoupons() throws CouponSystemException;
 	public List<Coupon> getAllCouponsCompany(long CompanyId) throws CouponSystemException;
 	public List<Coupon> getCouponsCompanyByType(long CompanyId, CouponType type) throws CouponSystemException;
+	public List<Coupon> getCouponsCompanyByPrice(long companyId, double price) throws CouponSystemException;
 	public List<Coupon> getAllpurchasedCoupons(long customerId) throws CouponSystemException;
 	public List<Coupon> getAllpurchasedCouponByType(long customerId, CouponType type) throws CouponSystemException;
-	public List<Coupon> getAllpurchasedCouponByPrice(long customerId, double price);
+	public List<Coupon> getAllpurchasedCouponByPrice(long customerId, double price) throws CouponSystemException;
 
 }
