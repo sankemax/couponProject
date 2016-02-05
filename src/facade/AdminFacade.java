@@ -73,6 +73,10 @@ public class AdminFacade implements CouponClientFacade{
 		return customerDAO.getCustomer(id);
 	}
 	
+	public Customer getCustomerByName(String name) throws CouponSystemException {
+		return customerDAO.getCustomerByName(name.toLowerCase());
+	}
+	
 	public List<Customer> getAllCustomer() throws CouponSystemException{
 		return customerDAO.getAllCustomer();
 	}

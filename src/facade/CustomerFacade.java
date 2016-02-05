@@ -68,7 +68,4 @@ public class CustomerFacade implements CouponClientFacade {
 		return this;
 	}
 
-	public Customer getCustomerByName(String name) throws CouponSystemException {
-		return customerDAO.getCustomerByName(name.toLowerCase());
-	}
 }
