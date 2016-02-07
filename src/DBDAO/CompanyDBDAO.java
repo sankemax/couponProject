@@ -105,7 +105,9 @@ public class CompanyDBDAO implements CompanyDAO {
 			try{
 				couponsOwnedByCompany = couponDAO.getAllCouponsCompany(companyId);
 			}catch(CouponSystemException e){
-				flag = false;
+			
+				if (e.getMessage().equals(CouponSystemException.COUPONS_NOT_EXIST)) flag = false;
+				else throw new CouponSystemException(e.getMessage());
 			}
 			
 			connection.setAutoCommit(false);
@@ -177,7 +179,7 @@ public class CompanyDBDAO implements CompanyDAO {
 			preparedSt.setLong(3, company.getId());
 			
 			if (preparedSt.executeUpdate() == 0){
-				throw new CouponSystemException(CouponSystemException.COMPANY_NOT_EXISTS);
+				throw new CouponSystemException(CouponSystemException.COMPANY_NOT_EXIST);
 			}
 					
 		} catch (SQLException e) {
@@ -210,7 +212,7 @@ public class CompanyDBDAO implements CompanyDAO {
 				company.setCompanyId(result.getLong(1));
 				
 			} else {
-				throw new CouponSystemException(CouponSystemException.COMPANY_NOT_EXISTS);
+				throw new CouponSystemException(CouponSystemException.COMPANY_NOT_EXIST);
 			}
 			
 		} catch (SQLException e) {
@@ -245,7 +247,7 @@ public class CompanyDBDAO implements CompanyDAO {
 					companyList.add(company);
 				}while(resultSet.next()); 
 			}else {
-				throw new CouponSystemException(CouponSystemException.COMPANYS_NOT_EXISTS);
+				throw new CouponSystemException(CouponSystemException.COMPANIES_NOT_EXIST);
 			}
 			
 		} catch (SQLException e) {
@@ -310,7 +312,7 @@ public class CompanyDBDAO implements CompanyDAO {
 				company.setEmail(result.getString(4));
 				
 			} else {
-				throw new CouponSystemException(CouponSystemException.COMPANY_NOT_EXISTS);
+				throw new CouponSystemException(CouponSystemException.COMPANY_NOT_EXIST);
 			}
 			return company;
 		} catch (SQLException e) {

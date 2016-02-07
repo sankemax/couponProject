@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import core.CouponSystemException;
+
 public class DbOperations {
 	
 	public static final String dbName = "couponDB";
@@ -20,7 +22,7 @@ public class DbOperations {
 	public static final String driverName = "org.apache.derby.jdbc.ClientDriver"; 
 	public static final String tableInfoPath = "src/TABLES.txt";
 	
-	public static void createDbAndTables() {
+	public static void createDbAndTables() throws CouponSystemException {
 		
 		File file = new File(tableInfoPath);
 		String sql = "";
@@ -57,9 +59,9 @@ public class DbOperations {
 			connection.commit();
 			
 		} catch (SQLException | FileNotFoundException | ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
 			SqlUtility.rollbackConnection(connection);
+			// TODO if there's a problem, after rollback, should we call this function again?
 			
 		} finally {
 			

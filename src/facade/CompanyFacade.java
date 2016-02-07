@@ -1,6 +1,7 @@
 package facade;
 
 
+import java.util.Date;
 import java.util.List;
 import DAO.*;
 import DBDAO.*;
@@ -56,6 +57,10 @@ public class CompanyFacade implements CouponClientFacade {
 
 	public List<Coupon> getCouponByPrice(double price) throws CouponSystemException{
 		return couponDAO.getCouponsCompanyByPrice(company.getId(), price);
+	}
+
+	public List<Coupon> getCouponByDate(Date date) throws CouponSystemException{
+		return couponDAO.getCouponsCompanyByDate(company.getId(), date);
 	}
 	
 	@Override
