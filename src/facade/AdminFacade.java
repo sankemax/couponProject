@@ -41,6 +41,10 @@ public class AdminFacade implements CouponClientFacade{
 			return companyDAO.getCompany(id);
 	}
 	
+	public Company getCompanyByName(String name) throws CouponSystemException{
+		return companyDAO.getCompanyByName(name.toLowerCase());
+	}
+	
 	public List<Company> getAllCompanies() throws CouponSystemException{
 		return companyDAO.getAllCompanies();
 	}
@@ -67,6 +71,10 @@ public class AdminFacade implements CouponClientFacade{
 	
 	public Customer getCustomer(long id) throws CouponSystemException{
 		return customerDAO.getCustomer(id);
+	}
+	
+	public Customer getCustomerByName(String name) throws CouponSystemException {
+		return customerDAO.getCustomerByName(name.toLowerCase());
 	}
 	
 	public List<Customer> getAllCustomer() throws CouponSystemException{

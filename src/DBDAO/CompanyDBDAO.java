@@ -87,6 +87,9 @@ public class CompanyDBDAO implements CompanyDAO {
 	@Override
 	public void removeCompany(Company company) throws CouponSystemException {
 
+		// this line is for the demonstration of the first part of the project only
+		company.setCompanyId(getCompanyByName(company.getCompName()).getId());
+		
 		Connection connection = connectionPool.getConnection();
 		String sql = null;
 		PreparedStatement preparedSt = null;
@@ -95,40 +98,51 @@ public class CompanyDBDAO implements CompanyDAO {
 			
 			long companyId = company.getId();
 			CouponDAO couponDAO = new CouponDBDAO();
-			List<Coupon> couponsOwnedByCompany = couponDAO.getAllCouponsCompany(companyId);
+			
+			List<Coupon> couponsOwnedByCompany = null;
+			boolean flag = true;
+			
+			try{
+				couponsOwnedByCompany = couponDAO.getAllCouponsCompany(companyId);
+			}catch(CouponSystemException e){
+				flag = false;
+			}
 			
 			connection.setAutoCommit(false);
 			
-			for (Coupon coupon : couponsOwnedByCompany) {
-				
-				long couponId = coupon.getId();
-				sql = "DELETE FROM customer_coupon WHERE coupon_id = ?";
-				preparedSt = connection.prepareStatement(sql);
-				
-				preparedSt.setLong(1, couponId);
-				preparedSt.executeQuery();
-				preparedSt.close();
-				
-				sql = "DELETE FROM company_coupon WHERE coupon_id = ?";
-				preparedSt = connection.prepareStatement(sql);
-				
-				preparedSt.setLong(1, couponId);
-				preparedSt.executeQuery();
-				preparedSt.close();
-				
-				sql = "DELETE FROM coupon WHERE id = ?";
-				preparedSt = connection.prepareStatement(sql);
-				
-				preparedSt.setLong(1, couponId);
-				preparedSt.executeQuery();
-				preparedSt.close();
+			if(flag){
+				for (Coupon coupon : couponsOwnedByCompany) {
+					
+					long couponId = coupon.getId();
+					sql = "DELETE FROM customer_coupon WHERE coupon_id = ?";
+					preparedSt = connection.prepareStatement(sql);
+					
+					preparedSt.setLong(1, couponId);
+					preparedSt.executeUpdate();
+					preparedSt.close();
+					
+					sql = "DELETE FROM company_coupon WHERE coupon_id = ?";
+					preparedSt = connection.prepareStatement(sql);
+					
+					preparedSt.setLong(1, couponId);
+					preparedSt.executeUpdate();
+					preparedSt.close();
+					
+					sql = "DELETE FROM coupon WHERE id = ?";
+					preparedSt = connection.prepareStatement(sql);
+					
+					preparedSt.setLong(1, couponId);
+					preparedSt.executeUpdate();
+					preparedSt.close();
+				}
 			}
+			
 			
 			sql = "DELETE FROM company WHERE id = ?";
 			preparedSt = connection.prepareStatement(sql);
 			
 			preparedSt.setLong(1, companyId);
-			preparedSt.executeQuery();
+			preparedSt.executeUpdate();
 			
 			connection.commit();
 			
@@ -146,6 +160,9 @@ public class CompanyDBDAO implements CompanyDAO {
 	@Override
 	public void updateCompany(Company company) throws CouponSystemException {
 
+		// this line is for the demonstration of the first part of the project only
+		company.setCompanyId(getCompanyByName(company.getCompName()).getId());
+		
 		Connection connection = connectionPool.getConnection();
 		PreparedStatement preparedSt = null;
 		String sql = null;
@@ -159,7 +176,7 @@ public class CompanyDBDAO implements CompanyDAO {
 			preparedSt.setString(2, company.getEmail());
 			preparedSt.setLong(3, company.getId());
 			
-			if (!preparedSt.execute()){
+			if (preparedSt.executeUpdate() == 0){
 				throw new CouponSystemException(CouponSystemException.COMPANY_NOT_EXISTS);
 			}
 					
@@ -175,7 +192,7 @@ public class CompanyDBDAO implements CompanyDAO {
 
 	@Override
 	public Company getCompany(long id) throws CouponSystemException {
-		
+				
 		Connection connection = connectionPool.getConnection();
 		ResultSet result = null;
 		Statement statement = null; 
@@ -184,7 +201,7 @@ public class CompanyDBDAO implements CompanyDAO {
 		
 		try {
 			
-			sql = "SELECT * FROM company WHERE company.id = '" + id + "' FETCH FIRST ROW ONLY";
+			sql = "SELECT * FROM company WHERE company.id = " + id + "FETCH FIRST ROW ONLY";
 			statement = connection.createStatement();
 			result = statement.executeQuery(sql);
 			if (result.next()) {

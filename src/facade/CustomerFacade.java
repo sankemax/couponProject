@@ -16,20 +16,20 @@ public class CustomerFacade implements CouponClientFacade {
 	private CustomerDAO customerDAO;
 	private CouponDAO couponDAO;
 	
-	public CustomerFacade() throws CouponSystemException{
+	public CustomerFacade() throws CouponSystemException {
 		customerDAO = new CustomerDBDAO();
 		couponDAO = new CouponDBDAO();
 	}
 	
-	public void purchaseCoupon(Coupon coupon) throws CouponSystemException{
+	public void purchaseCoupon(Coupon coupon) throws CouponSystemException {
 		
 		coupon.setCouponId(couponDAO.getCouponByTitle(coupon.getTitle()).getId());
 		
-		if(customerDAO.isPurchased(customer.getId(), coupon.getId())){
+		if(customerDAO.isPurchased(customer.getId(), coupon.getId())) {
 			throw new CouponSystemException(CouponSystemException.COUPON_ALREADY_PURCHASED);
 		}
 		
-		if(couponDAO.getCoupon(coupon.getId()).getAmount() <= 0){
+		if(couponDAO.getCoupon(coupon.getId()).getAmount() <= 0) {
 			throw new CouponSystemException(CouponSystemException.COUPON_OUT_OF_STOCK);
 		}
 		
@@ -39,22 +39,22 @@ public class CustomerFacade implements CouponClientFacade {
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
 		Date today = calendar.getTime();
-		if(couponDAO.getCoupon(coupon.getId()).getEndDate().before(today)){
+		if(couponDAO.getCoupon(coupon.getId()).getEndDate().before(today)) {
 			throw new CouponSystemException(CouponSystemException.COUPON_EXPIRATION_DATE_PASSED);			
 		}
 		customerDAO.purchaseCoupon(customer.getId(), coupon.getId());
 	}
 	
-	public List<Coupon> getAllpurchasedCoupons() throws CouponSystemException{
+	public List<Coupon> getAllpurchasedCoupons() throws CouponSystemException {
 		return couponDAO.getAllpurchasedCoupons(customer.getId());
 
 	}
 	
-	public List<Coupon> getAllpurchasedCouponByType(CouponType type) throws CouponSystemException{
+	public List<Coupon> getAllpurchasedCouponByType(CouponType type) throws CouponSystemException {
 		return couponDAO.getAllpurchasedCouponByType(customer.getId(), type);
 	}
 	
-	public List<Coupon> getAllpurchasedCouponByPrice(double Price){
+	public List<Coupon> getAllpurchasedCouponByPrice(double Price) throws CouponSystemException {
 		return couponDAO.getAllpurchasedCouponByPrice(customer.getId(), Price);
 	}
 	
@@ -68,7 +68,4 @@ public class CustomerFacade implements CouponClientFacade {
 		return this;
 	}
 
-	public Customer getCustomerByName(String name) throws CouponSystemException{
-		return customerDAO.getCustomerByName(name.toLowerCase());
-	}
 }

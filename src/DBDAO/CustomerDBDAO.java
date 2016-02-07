@@ -48,9 +48,12 @@ public class CustomerDBDAO implements CustomerDAO {
 	@Override
 	public void removeCustomer(Customer customer) throws CouponSystemException {
 		
+		// this line of code is needed only for the first step demonstration
+		customer.setId(getCustomerByName(customer.getCustName()).getId());
+		
 		Connection connection = pool.getConnection();
-		String sql1 = "DELETE FROM Customer_Coupon  WHERE CUST_ID =" + customer.getId();
-		String sql2 = "DELETE FROM Customer  WHERE ID =" + customer.getId();
+		String sql1 = "DELETE FROM customer_coupon  WHERE cust_id =" + customer.getId();
+		String sql2 = "DELETE FROM customer  WHERE id =" + customer.getId();
 		
 		
 		try(Statement st = connection.createStatement();){
@@ -72,10 +75,11 @@ public class CustomerDBDAO implements CustomerDAO {
 	@Override
 	public void updateCustomer(Customer customer) throws CouponSystemException {
 		
-		
+		// this line of code is needed only for the first step demonstration
+		customer.setId(getCustomerByName(customer.getCustName()).getId());
+
 		Connection connection = pool.getConnection();
 		String sql = "UPDATE customer SET customer.password = ? WHERE customer.id = ?";
-		
 		
 		try(PreparedStatement ps = connection.prepareStatement(sql);) {
 			
@@ -132,13 +136,13 @@ public class CustomerDBDAO implements CustomerDAO {
 		try(Statement st = connection.createStatement();) {
 			
 			rs = st.executeQuery(sql);
-			if(rs.next()){
+			if(rs.next()) {
 				do{
 					Customer customer = new Customer(rs.getString(2), rs.getString(3));
 					customer.setId(rs.getLong(1));
 					customers.add(customer);
-				}while(rs.next());
-			}else {
+				} while(rs.next());
+			} else {
 				throw new CouponSystemException(CouponSystemException.CUSTOMERS_NOT_EXISTS);
 			}
 		} catch (SQLException e) {
