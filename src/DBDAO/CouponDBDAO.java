@@ -1,6 +1,7 @@
 package DBDAO;
 
 import java.sql.*;
+import java.util.Date;
 import java.util.List;
 import DAO.CouponDAO;
 import beans.Coupon;
@@ -258,11 +259,11 @@ public class CouponDBDAO implements CouponDAO {
 			preparedStatement = connection.prepareStatement(sql);
 			preparedStatement.setLong(1, companyId);
 			resultSet = preparedStatement.executeQuery();
-			
 			couponList = SqlUtility.createCoupons(resultSet);
 			return couponList;
-		} catch (SQLException e) {
-			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
+			
+		} catch (SQLException | CouponSystemException e) {
+			throw new CouponSystemException(e.getMessage());
 		} finally {
 			
 			SqlUtility.closeStatement(preparedStatement);
@@ -453,4 +454,61 @@ public class CouponDBDAO implements CouponDAO {
 		}
 	}
 
+	@Override
+	public List<Coupon> getCouponsCompanyByDate(long companyId, Date date) throws CouponSystemException {
+
+		Connection connection = connectionPool.getConnection();
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
+		String sql = "SELECT id, title, start_date, end_date, amount, coupon_type, message, price, image FROM coupon cu INNER JOIN company_coupon compcu ON cu.id = compcu.coupon_id WHERE compcu.comp_id = ? AND cu.end_date <= ?";
+		List<Coupon> couponList = null;
+		
+		try {
+			
+			preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setLong(1, companyId);
+			preparedStatement.setDate(2, new java.sql.Date(date.getTime()));
+			resultSet = preparedStatement.executeQuery();
+			
+			couponList = SqlUtility.createCoupons(resultSet);
+			return couponList;
+			
+		} catch (SQLException e) {
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
+		} finally {
+			
+			SqlUtility.closeStatement(preparedStatement);
+			SqlUtility.closeResultSet(resultSet);
+			connectionPool.returnConnection(connection);
+		}
+	}
+
+	@Override
+	public List<Coupon> getAllPurchacedCouponByDate(long customerId, Date date) throws CouponSystemException {
+		
+		Connection connection = connectionPool.getConnection();
+		PreparedStatement preparedStatement = null;
+		ResultSet resultSet = null;
+		String sql = "SELECT id, title, start_date, end_date, amount, coupon_type, message, price, image FROM coupon cu INNER JOIN customer_coupon cucu ON cu.id = cucu.coupon_id WHERE cucu.cust_id = ? AND cu.end_date <= ?";
+		List<Coupon> couponList = null;
+		
+		try {
+			
+			preparedStatement = connection.prepareStatement(sql);
+			preparedStatement.setLong(1, customerId);
+			preparedStatement.setDate(2, new java.sql.Date(date.getTime()));
+			resultSet = preparedStatement.executeQuery();
+			
+			couponList = SqlUtility.createCoupons(resultSet);
+			return couponList;
+			
+		} catch (SQLException e) {
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
+		} finally {
+			
+			SqlUtility.closeStatement(preparedStatement);
+			SqlUtility.closeResultSet(resultSet);
+			connectionPool.returnConnection(connection);
+		}
+	}
 }

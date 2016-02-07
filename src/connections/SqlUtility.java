@@ -78,8 +78,8 @@ public class SqlUtility {
 					coupon.setCouponId(resultSet.getLong(1));
 					couponList.add(coupon);
 				}while (resultSet.next());
-			}else {
-				throw new CouponSystemException(CouponSystemException.COUPONS_NOT_EXISTS);
+			} else {
+				throw new CouponSystemException(CouponSystemException.COUPONS_NOT_EXIST);
 			}
 		} catch (SQLException e) {
 			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);

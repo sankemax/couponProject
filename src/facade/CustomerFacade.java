@@ -57,6 +57,10 @@ public class CustomerFacade implements CouponClientFacade {
 	public List<Coupon> getAllpurchasedCouponByPrice(double Price) throws CouponSystemException {
 		return couponDAO.getAllpurchasedCouponByPrice(customer.getId(), Price);
 	}
+
+	public List<Coupon> getAllpurchasedCouponByDate(Date date) throws CouponSystemException {
+		return couponDAO.getAllPurchacedCouponByDate(customer.getId(), date);
+	}
 	
 	@Override
 	public CouponClientFacade login(String name, String password) throws CouponSystemException {

@@ -1,5 +1,6 @@
 package DAO;
 
+import java.util.Date;
 import java.util.List;
 import beans.Coupon;
 import beans.CouponType;
@@ -17,8 +18,10 @@ public interface CouponDAO {
 	public List<Coupon> getAllCouponsCompany(long CompanyId) throws CouponSystemException;
 	public List<Coupon> getCouponsCompanyByType(long CompanyId, CouponType type) throws CouponSystemException;
 	public List<Coupon> getCouponsCompanyByPrice(long companyId, double price) throws CouponSystemException;
+	public List<Coupon> getCouponsCompanyByDate(long id, Date date) throws CouponSystemException;
 	public List<Coupon> getAllpurchasedCoupons(long customerId) throws CouponSystemException;
 	public List<Coupon> getAllpurchasedCouponByType(long customerId, CouponType type) throws CouponSystemException;
 	public List<Coupon> getAllpurchasedCouponByPrice(long customerId, double price) throws CouponSystemException;
+	public List<Coupon> getAllPurchacedCouponByDate(long customerId, Date date) throws CouponSystemException;
 
 }

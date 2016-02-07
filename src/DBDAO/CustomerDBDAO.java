@@ -87,7 +87,7 @@ public class CustomerDBDAO implements CustomerDAO {
 			ps.setLong(2, customer.getId());
 			
 			if(ps.executeUpdate() == 0) {
-				throw new CouponSystemException(CouponSystemException.CUSTOMER_NOT_EXISTS);
+				throw new CouponSystemException(CouponSystemException.CUSTOMER_NOT_EXIST);
 			}
 			
 		} catch (SQLException e) {
@@ -114,7 +114,7 @@ public class CustomerDBDAO implements CustomerDAO {
 				customer = new Customer(rs.getString(2), rs.getString(3));
 				customer.setId(rs.getLong(1));
 			}else{
-				throw new CouponSystemException(CouponSystemException.CUSTOMER_NOT_EXISTS);
+				throw new CouponSystemException(CouponSystemException.CUSTOMER_NOT_EXIST);
 			}
 		} catch (SQLException e) {
 			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
@@ -143,7 +143,7 @@ public class CustomerDBDAO implements CustomerDAO {
 					customers.add(customer);
 				} while(rs.next());
 			} else {
-				throw new CouponSystemException(CouponSystemException.CUSTOMERS_NOT_EXISTS);
+				throw new CouponSystemException(CouponSystemException.CUSTOMERS_NOT_EXIST);
 			}
 		} catch (SQLException e) {
 			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
@@ -171,7 +171,7 @@ public class CustomerDBDAO implements CustomerDAO {
 				customer = new Customer(rs.getString(2), rs.getString(3));
 				customer.setId(rs.getLong(1));
 			}else{
-				throw new CouponSystemException(CouponSystemException.CUSTOMER_NOT_EXISTS);
+				throw new CouponSystemException(CouponSystemException.CUSTOMER_NOT_EXIST);
 			}
 		} catch (SQLException e) {
 			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);

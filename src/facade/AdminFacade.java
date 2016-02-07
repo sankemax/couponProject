@@ -37,7 +37,7 @@ public class AdminFacade implements CouponClientFacade{
 		companyDAO.updateCompany(company);
 	}
 	
-	public Company getCompany(long id) throws CouponSystemException{
+	public Company getCompany(long id) throws CouponSystemException {
 			return companyDAO.getCompany(id);
 	}
 	

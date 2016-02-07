@@ -16,7 +16,11 @@ import facade.CustomerFacade;
 public class TestTransactions {
 
 	public static void main(String[] args) {
-		DbOperations.createDbAndTables();;
+		try {
+			DbOperations.createDbAndTables();
+		} catch (CouponSystemException e1) {
+			System.err.println("creation of the tables was unsuccessfull " + e1.getMessage());
+		}
 		
 		try {
 			
@@ -25,7 +29,7 @@ public class TestTransactions {
 			
 			//admin and his functions:
 			AdminFacade admin = (AdminFacade) couponSystem.login("ADMIN", "1234", ClientType.ADMIN);
-			System.out.println("admin is loged in.");
+			System.err.println("admin is logged in. (printed as an error for visual convenience to represent a correct flow of events)");
 			
 			//companies
 			Company company1 = new Company("Maxim","1234","maxim1@gmail.com");
@@ -33,16 +37,23 @@ public class TestTransactions {
 			Company company3 = new Company("Max","1234","meir2@gmail.com");
 			
 			
-			admin.createCompany(company1);
-			long companyId = company1.getId();
-			System.out.println("admin create and get company1: " + admin.getCompany(companyId));
+			try{
+				admin.createCompany(company1);
+				// in this demonstration, once the main runs the second time, the ID of the company will not be saved in the company bean, 
+				// since it was created in the first run, so if one wants to get the company by its ID, it is necessary to get the id using the COMPANY NAME, and only then, to show
+				// the functionality of the method getCompany that gets the bean form the DB using the ID.
+				// this statement is valid for some other lines in the code as well, for example when trying to view a customer by ID
+				long compId = admin.getCompanyByName(company1.getCompName()).getId();
+				System.out.println("admin creates and gets company1: " + admin.getCompany(compId));
+				admin.createCompany(company2);
+				String companyName = company2.getCompName();
+				System.out.println("admin creates and gets company2: " + admin.getCompanyByName(companyName));
+				
+			}catch (CouponSystemException e){
+				System.err.println("trying to create a company that already exists prints: "+e.getMessage());
+			}
 			
-			admin.createCompany(company2);
-			String companyName = company2.getCompName();
-			System.out.println("admin create and get company2: " + admin.getCompanyByName(companyName));
-			
-			
-			//Trying to create a company with the same name
+			//Trying to create a company that already exists
 			try{
 				admin.createCompany(company2);
 			}catch (CouponSystemException e){
@@ -50,11 +61,11 @@ public class TestTransactions {
 			}
 			
 			
-			//Trying to get a company non System
+			//Trying to get a company that is not registered in the System
 			try {
 				admin.getCompanyByName("aaaa");
 			} catch (CouponSystemException e) {
-				System.err.println(e.getMessage());
+				System.err.println("trying to get a company that doesnt exists prints: "+e.getMessage());
 			}
 			
 			//updateCompany
@@ -62,60 +73,83 @@ public class TestTransactions {
 			company1.setEmail("gmail@Maxim.com");
 			admin.updateCompany(company1);
 			System.out.println("admin update (password & email) and get company1: " + admin.getCompany(company1.getId()));
+			try {
+				
+				admin.createCompany(company3);
+			} catch(CouponSystemException e) {				
+				System.err.println("trying to create a company that already exists prints: "+e.getMessage());
+			}
 			
+			// view all companies
+			try {
+				
+				System.out.println("admin asks to view all companies:");
+				System.out.println(admin.getAllCompanies());
+				
+			} catch(CouponSystemException e) {
+				System.err.println("trying to view all companies, while none exist prints:" + e.getMessage());
+			}
 			
-			admin.createCompany(company3);
-			
-			System.out.println("all company");
-			System.out.println(admin.getAllCompanies());
-			
-			//removeCompany
-			admin.removeCompany(company3);
-			
-			System.out.println("all company");
-			System.out.println(admin.getAllCompanies());
-			
-			
-		
+			// admin removes a Company:
+			try {
+				
+				admin.removeCompany(company3);
+				System.out.println("all companies after removal:");
+				System.out.println(admin.getAllCompanies());
+			} catch(CouponSystemException e) {				
+				if (e.getMessage().equals(CouponSystemException.COMPANIES_NOT_EXIST)) {
+					System.err.println("trying to view all companies, while none exist prints:");
+				} else {					
+					System.err.println("tring to remove a company that does not exist prints:");
+				}
+				System.err.println(e.getMessage());
+			}
 			
 			//customers
 			Customer customer1 = new Customer("mike", "1234");
 			Customer customer2 = new Customer("herold", "1234");
 			Customer customer3 = new Customer("brian", "1234");
 			
+			try {				
+				System.out.println("admin creates customer1:");
+				admin.createCustomer(customer1);
+			} catch (CouponSystemException e) {
+				System.err.println("trying to create a customer that already exists prints: " + e.getMessage());
+			}
+			long customerId = admin.getCustomerByName(customer1.getCustName()).getId();
+			System.out.println("admin gets customer1 by ID: " + admin.getCustomer(customerId));
+
+			try {				
+				System.out.println("admin creates customer2:");
+				admin.createCustomer(customer2);
+			} catch (CouponSystemException e) {
+				System.err.println("trying to create a customer that already exists prints: " + e.getMessage());
+			}
 			
-			admin.createCustomer(customer1);
-			long customerId = customer1.getId();
-			System.out.println("admin create and get customer1: " + admin.getCustomer(customerId));
-			
-			admin.createCustomer(customer2);
 			String customerName = customer2.getCustName();
-			System.out.println("admin create and get customer2: " + admin.getCustomerByName(customerName));
-			
+			System.out.println("admin gets customer2 by NAME: " + admin.getCustomerByName(customerName));
 			
 			//Trying to create a customer with the same name
 			try{
 				admin.createCustomer(customer2);
 			}catch (CouponSystemException e){
-				System.err.println(e.getMessage());
+				System.err.println("trying to create a customer with an already existing name in the DB prints:" + e.getMessage());
 			}
 			
-			
-			//Trying to get a customer non System
+			//Trying to get a customer that is not registered in the system:
 			try {
 				admin.getCustomerByName("aaaa");
 			} catch (CouponSystemException e) {
-				System.err.println(e.getMessage());
+				System.err.println("Trying to get a customer that is not registered in the system prints: " + e.getMessage());
 			}
 			
 			//update customer
 			customer1.setPassword("4321");
 			admin.updateCustomer(customer1);
-			System.out.println("admin update (password) and get customer1: " + admin.getCustomer(customer1.getId()));
+			System.out.println("admin updates customer1 password and gets customer1 by ID: " + admin.getCustomer(customer1.getId()));
 			
-			
+			// TODO i've stopped here... continue next time
 			admin.createCustomer(customer3);
-			
 			System.out.println("all customer");
 			System.out.println(admin.getAllCustomer());
 			
