@@ -23,6 +23,7 @@ public class CustomerFacade implements CouponClientFacade {
 	
 	public void purchaseCoupon(Coupon coupon) throws CouponSystemException {
 		
+		// the next row is for demonstration of the first step in the project only:
 		coupon.setCouponId(couponDAO.getCouponByTitle(coupon.getTitle()).getId());
 		
 		if(customerDAO.isPurchased(customer.getId(), coupon.getId())) {
@@ -34,10 +35,6 @@ public class CustomerFacade implements CouponClientFacade {
 		}
 		
 		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.HOUR_OF_DAY, 0);
-		calendar.set(Calendar.MINUTE, 0);
-		calendar.set(Calendar.SECOND, 0);
-		calendar.set(Calendar.MILLISECOND, 0);
 		Date today = calendar.getTime();
 		if(couponDAO.getCoupon(coupon.getId()).getEndDate().before(today)) {
 			throw new CouponSystemException(CouponSystemException.COUPON_EXPIRATION_DATE_PASSED);			

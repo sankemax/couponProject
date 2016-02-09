@@ -35,8 +35,9 @@ public class CustomerDBDAO implements CustomerDAO {
 				ps.execute();
 				
 				rs = ps.getGeneratedKeys();
-				rs.next();
-				customer.setId(rs.getLong(1));
+				if (rs.next()) customer.setId(rs.getLong(1));
+				else throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
+				
 			} catch (SQLException e) {
 				throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			}finally {
@@ -214,7 +215,6 @@ public class CustomerDBDAO implements CustomerDAO {
 		Connection connection = pool.getConnection();
 		String sql = "SELECT * FROM Customer_Coupon WHERE CUST_ID = ? AND COUPON_ID = ? FETCH FIRST ROW ONLY";
 		ResultSet rs = null;
-		boolean flag = false;
 			
 		try(PreparedStatement ps = connection.prepareStatement(sql);){
 			
@@ -222,11 +222,9 @@ public class CustomerDBDAO implements CustomerDAO {
 			ps.setLong(2, couponId);
 			rs = ps.executeQuery();
 			
-			if(rs.next()){
-				flag = true;
-			}
+			if(rs.next()) return true;
+			return false;
 			
-			return flag;
 		} catch (SQLException e) {
 			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}finally {

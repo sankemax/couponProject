@@ -13,10 +13,7 @@ public class DailyCouponExpirationTask implements Runnable {
 	private CouponDAO couponDAO;
 	private boolean quit;
 	private static final long MILLI_SEC_IN_DAY = 86_400_000;
-	
-	// TODO only temporal for testing
-	private static final long TESTING = 10_000; 
-	
+		
 	public DailyCouponExpirationTask() throws CouponSystemException {
 		
 		couponDAO = new CouponDBDAO();
@@ -26,16 +23,14 @@ public class DailyCouponExpirationTask implements Runnable {
 	@Override
 	public void run() {
 		
-		// TODO set the thread to daemon and check that it works
-//		Thread.currentThread().setDaemon(true);		
+		if(Thread.currentThread().getState().toString().equals("NEW")) {
+			Thread.currentThread().setDaemon(true);		
+		}
+		
 		while (! quit) {
 			try {
 			
 				Calendar calendar = Calendar.getInstance();
-				calendar.set(Calendar.HOUR_OF_DAY, 0);
-				calendar.set(Calendar.MINUTE, 0);
-				calendar.set(Calendar.SECOND, 0);
-				calendar.set(Calendar.MILLISECOND, 0);
 				Date today = calendar.getTime();
 				
 				Collection<Coupon> coupons = couponDAO.getAllCoupons();
@@ -43,14 +38,14 @@ public class DailyCouponExpirationTask implements Runnable {
 					
 					if (coupon.getEndDate().before(today)) {
 						
+						// DISABLE for for testing purposes
 						couponDAO.removeCoupon(coupon);
 					}
 				}
 				
-	//				Thread.sleep(MILLI_SEC_IN_DAY);
-					Thread.sleep(TESTING);
+					Thread.sleep(MILLI_SEC_IN_DAY);
 			} catch (InterruptedException e) {
-				break;
+				quit = true;
 			} catch (CouponSystemException e) {
 				// TODO what should we do?
 			}
