@@ -93,52 +93,43 @@ public class CompanyDBDAO implements CompanyDAO {
 		Connection connection = connectionPool.getConnection();
 		String sql = null;
 		PreparedStatement preparedSt = null;
+		ResultSet couponsId = null;
 		
 		try {
 			
-			long companyId = company.getId();
-			CouponDAO couponDAO = new CouponDBDAO();
-			
-			List<Coupon> couponsOwnedByCompany = null;
-			boolean flag = true;
-			
-			try{
-				couponsOwnedByCompany = couponDAO.getAllCouponsCompany(companyId);
-			}catch(CouponSystemException e){
-			
-				if (e.getMessage().equals(CouponSystemException.COUPONS_NOT_EXIST)) flag = false;
-				else throw new CouponSystemException(e.getMessage());
-			}
-			
 			connection.setAutoCommit(false);
+
+			long companyId = company.getId();
+			sql = "SELECT id FROM coupon c INNER JOIN company_coupon cc ON c.id = cc.coupon_id WHERE comp_id = ?";
+			preparedSt = connection.prepareStatement(sql);
 			
-			if(flag){
-				for (Coupon coupon : couponsOwnedByCompany) {
-					
-					long couponId = coupon.getId();
-					sql = "DELETE FROM customer_coupon WHERE coupon_id = ?";
-					preparedSt = connection.prepareStatement(sql);
-					
-					preparedSt.setLong(1, couponId);
-					preparedSt.executeUpdate();
-					preparedSt.close();
-					
-					sql = "DELETE FROM company_coupon WHERE coupon_id = ?";
-					preparedSt = connection.prepareStatement(sql);
-					
-					preparedSt.setLong(1, couponId);
-					preparedSt.executeUpdate();
-					preparedSt.close();
-					
-					sql = "DELETE FROM coupon WHERE id = ?";
-					preparedSt = connection.prepareStatement(sql);
-					
-					preparedSt.setLong(1, couponId);
-					preparedSt.executeUpdate();
-					preparedSt.close();
-				}
+			preparedSt.setLong(1, companyId);
+			couponsId = preparedSt.executeQuery();	
+			
+			while(couponsId.next()) {
+				
+				long couponId = couponsId.getLong(1);
+				sql = "DELETE FROM customer_coupon WHERE coupon_id = ?";
+				preparedSt = connection.prepareStatement(sql);
+				
+				preparedSt.setLong(1, couponId);
+				preparedSt.executeUpdate();
+				preparedSt.close();
+				
+				sql = "DELETE FROM company_coupon WHERE coupon_id = ?";
+				preparedSt = connection.prepareStatement(sql);
+				
+				preparedSt.setLong(1, couponId);
+				preparedSt.executeUpdate();
+				preparedSt.close();
+				
+				sql = "DELETE FROM coupon WHERE id = ?";
+				preparedSt = connection.prepareStatement(sql);
+				
+				preparedSt.setLong(1, couponId);
+				preparedSt.executeUpdate();
+				preparedSt.close();
 			}
-			
 			
 			sql = "DELETE FROM company WHERE id = ?";
 			preparedSt = connection.prepareStatement(sql);
@@ -154,6 +145,7 @@ public class CompanyDBDAO implements CompanyDAO {
 			
 		} finally {
 			
+			SqlUtility.closeResultSet(couponsId);
 			SqlUtility.closeStatement(preparedSt);
 			connectionPool.returnConnection(connection);
 		}		

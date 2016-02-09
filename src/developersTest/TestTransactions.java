@@ -2,6 +2,8 @@ package developersTest;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+
 import beans.Company;
 import beans.Coupon;
 import beans.CouponType;
@@ -146,7 +148,7 @@ public class TestTransactions {
 			} catch (CouponSystemException e) {
 				System.err.println("Trying to get a customer that is not registered in the system prints: " + e.getMessage());
 			}
-			
+
 			// updating customer password
 			customer1.setPassword("4321");
 			admin.updateCustomer(customer1);
@@ -176,9 +178,9 @@ public class TestTransactions {
 			
 			//coupons
 			Coupon coupon1 = new Coupon("clothes sale5", new Date(), new Date(cal.getTimeInMillis() + 1000*3600*24), 10, CouponType.SPORTS, "buy me please!", 30, "http://something.co");
-			Coupon coupon2 = new Coupon("armpit sale5", new Date(), new Date(cal.getTimeInMillis() + 1000*3600*24*2), 10, CouponType.HEALTH, "buy meeeeeeee", 35.5, "http://something.co");
-			Coupon coupon3 = new Coupon("retard clock5", new Date(), new Date(cal.getTimeInMillis() - 1000*3600*24*4), 10, CouponType.ELECTRICITY, "please!", 40, "http://something.co");
-			Coupon coupon4 = new Coupon("clothes for fat ppl5", new Date(), new Date(cal.getTimeInMillis() + 1000*3600*24*7), 1, CouponType.CLOTHES, "me", 45.5, "http://something.co");
+			Coupon coupon2 = new Coupon("some other sale5", new Date(), new Date(cal.getTimeInMillis() + 1000*3600*24*2), 10, CouponType.HEALTH, "buy meeeeeeee", 35.5, "http://something.co");
+			Coupon coupon3 = new Coupon("clock5", new Date(), new Date(cal.getTimeInMillis() - 1000*3600*24*4), 10, CouponType.ELECTRICITY, "please!", 40, "http://something.co");
+			Coupon coupon4 = new Coupon("fat cat for ppl5", new Date(), new Date(cal.getTimeInMillis() + 1000*3600*24*7), 0, CouponType.CLOTHES, "me", 45.5, "http://something.co");
 			
 			
 			// Trying to get all company coupons when there are none
@@ -195,7 +197,7 @@ public class TestTransactions {
 				/**
 				 *  the next few rows are written to get the coupon ID into the coupon bean in order to correctly remove them
 				 */
-				coupon1.setCouponId(company.getCouponByTitle(coupon1.getTitle()).getId());
+//				coupon1.setCouponId(company.getCouponByTitle(coupon1.getTitle()).getId());
 //				coupon1.setCouponId(company.getCouponByTitle(coupon2.getTitle()).getId());
 //				coupon1.setCouponId(company.getCouponByTitle(coupon3.getTitle()).getId());
 //				coupon1.setCouponId(company.getCouponByTitle(coupon4.getTitle()).getId());
@@ -204,7 +206,7 @@ public class TestTransactions {
 				 */
 				
 				// coupon removal for convenience of testing
-				company.removeCoupon(coupon1);
+//				company.removeCoupon(coupon1);
 //				company.removeCoupon(coupon2);
 //				company.removeCoupon(coupon3);
 //				company.removeCoupon(coupon4);
@@ -245,27 +247,30 @@ public class TestTransactions {
 			try{
 				company.createCoupon(coupon1);
 			}catch (CouponSystemException e){
-				System.err.println("Trying to create a coupon which already exists / with the same name" + e.getMessage());
+				System.err.println("Trying to create a coupon which already exists / with the same name, prints: " + e.getMessage());
 			}
 			
-			// TODO i've stopped here... continue next time
 			//update coupon
+			
+			coupon1.setCouponId(company.getCouponByTitle(coupon1.getTitle()).getId());
+			System.out.println("updating the coupon:\n" + company.getCoupon(coupon1.getId()));
 			coupon1.setEndDate(new Date(cal.getTimeInMillis() + 1000*3600*24*3));
 			coupon1.setPrice(20);
+			coupon1.setMessage("hello world");
+			coupon1.setType(CouponType.RESTAURANTS);
 			company.updateCoupon(coupon1);
-			System.out.println(company.getCoupon(coupon1.getId()));
-			
-			
+			System.out.println("coupon after update (if the coupon was already updated in other runs, you may not see any difference):\n" + company.getCoupon(coupon1.getId()));
 			
 			//customer and his functions:
 			CustomerFacade customer = (CustomerFacade) couponSystem.login("mike", "4321", ClientType.CUSTOMER);
 			
 			
-			//customer logging in with wrong name
+			//customer login with wrong name
 			try{
+				@SuppressWarnings("unused")
 				CustomerFacade customerTest = (CustomerFacade) couponSystem.login("mike", "12345", ClientType.CUSTOMER);
 			}catch (CouponSystemException e){
-				System.err.println(e.getMessage());
+				System.err.println("when a customer login is incorrect, it prints: " + e.getMessage());
 			}
 			
 			
@@ -273,48 +278,61 @@ public class TestTransactions {
 			try{
 				customer.getAllpurchasedCoupons();
 			}catch (CouponSystemException e){
-				System.err.println(e.getMessage());
+				System.err.println("if the customer has no coupons, it prints: " + e.getMessage());
 			}
 			
 			
-			//purchase coupon
+				
+			// in case the information of the coupon was changed during the developers test (ID and/or name) and the bean no longer
+			// corresponds to the actual information in the DB we refresh the beans:
+			try {
+				
+				List<Coupon> list = company.getAllCoupons();
+				coupon1 = list.get(0);
+				coupon2 = list.get(1);
+				coupon3 = list.get(2);
+				coupon4 = list.get(3);
+				
+			} catch (CouponSystemException e) {
+				System.err.println(e.getMessage());
+			}
+			
+			// a customer purchases a coupon (in this specific developers check, we suppose that the coupon exists):			
+			try{
+			
 			customer.purchaseCoupon(coupon1);
 			customer.purchaseCoupon(coupon2);
 			
-			
-			//Attempt to buy a coupon already bought
-			try{
-				customer.purchaseCoupon(coupon1);
+			//Attempt to buy a coupon that was already bought
+			customer.purchaseCoupon(coupon2);
 			}catch (CouponSystemException e){
-				System.err.println(e.getMessage());
+				System.err.println("while attempting to buy an already bought coupon, it prints: " + e.getMessage());
 			}
 			
-			
-			//Attempt to buy a coupon expired
+			//Attempt to buy an expired coupon:
 			try{
 				customer.purchaseCoupon(coupon3);
 			}catch (CouponSystemException e){
-				System.err.println(e.getMessage());
+				System.err.println("while attempting to buy an expired coupon, it prints (in order for this test to work, one needs to disable the DailyCouponExpirationTask, so it won't delete the expired coupon): " + e.getMessage());
 			}
 			
-			//Attempt to buy a coupon is out of stock
+			// Attempt to buy a coupon that is out of stock:
 			try{
 				customer.purchaseCoupon(coupon4);
 			}catch (CouponSystemException e){
-				System.err.println(e.getMessage());
+				System.err.println("while attempting to buy a coupon that is out of stock, it prints: " + e.getMessage());
 			}
 			
-			
 			//get all purchased coupons
-			System.out.println(customer.getAllpurchasedCoupons());
+			System.out.println("all customers purchased coupons:\n" + customer.getAllpurchasedCoupons());
 			
 			//get all purchased coupon by price
-			System.out.println(customer.getAllpurchasedCouponByPrice(39));
+			System.out.println("all customers' purchased coupons by price (39):\n" + customer.getAllpurchasedCouponByPrice(39));
 			
 			//get all purchased coupon by type
-			System.out.println(customer.getAllpurchasedCouponByType(CouponType.HEALTH));
+			System.out.println("all customers purchased couponsby type (health):\n" + customer.getAllpurchasedCouponByType(CouponType.HEALTH));
 			
-			// get coupons by price by company facade:
+			// get coupons by price using company facade:
 			try {
 				System.out.println("20:");
 				System.out.println(company.getCouponByPrice(20));
@@ -328,7 +346,7 @@ public class TestTransactions {
 				System.err.println("when there are no coupons registered for the COMPANY under the specified amount, it prints: " + e.getMessage());
 			}
 
-			// get coupons by price by cusotmer facade:
+			// get coupons by price using cusotmer facade:
 			try {
 				System.out.println("20:");
 				System.out.println(customer.getAllpurchasedCouponByPrice(20));
@@ -342,7 +360,7 @@ public class TestTransactions {
 				System.err.println("when there are no coupons registered for the CUSTOMER under the specified amount, it prints: " + e.getMessage());
 			}
 
-			// get coupons by end-date by company:
+			// get coupons by end-date using company facade:
 			try {
 				// a date after the creation of the coupons
 				System.out.println("coupons that are valid till: " + new java.util.Date());
@@ -352,23 +370,27 @@ public class TestTransactions {
 				System.out.println("coupons that are valid till: " + new java.util.Date(cal.getTimeInMillis() - 990000000));
 				System.out.println(company.getCouponByDate(new java.util.Date(cal.getTimeInMillis() - 999999999)));
 			} catch(CouponSystemException e) {
-				System.err.println("when there are no coupons registered for the coupon under the specified amount, it prints: " + e.getMessage());
+				System.err.println("when there are no coupons registered for the COMPANY that are valid till the specified date, it prints: " + e.getMessage());
 			}
 			
+			// get all coupons before deletion
+			System.out.println("all companys' coupons before a deletion of a coupon:\n");			
+			System.out.println(company.getAllCoupons());			
 			//company remove coupon
 			company.removeCoupon(coupon1);
 			
 			//get all coupons After deletion
+			System.out.println("all companys' coupons after a deletion of a coupon:\n");			
 			System.out.println(company.getAllCoupons());			
 			
 			//admin remove company
 			admin.removeCompany(company1);
 			
-			// get all purchased coupons After deletion
+			// get all purchased customers' coupons After deletion of the company (and subsequently the coupons)
 			try{
 				customer.getAllpurchasedCoupons();
 			}catch (CouponSystemException e){
-				System.err.println(e.getMessage());
+				System.err.println("when a customer has no purchased coupons, it prints: " + e.getMessage());
 			}
 			
 			couponSystem.shutdown();
