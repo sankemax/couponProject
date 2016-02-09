@@ -58,10 +58,13 @@ public class DbOperations {
 			}
 			connection.commit();
 			
-		} catch (SQLException | FileNotFoundException | ClassNotFoundException e) {
+		} catch (SQLException | ClassNotFoundException | FileNotFoundException e) {
 			
-			SqlUtility.rollbackConnection(connection);
-			// TODO if there's a problem, after rollback, should we call this function again?
+			Class<? extends Exception> exception = e.getClass();
+			if (exception.equals(SQLException.class)) SqlUtility.rollbackConnection(connection);
+			// TODO should we create a new exception for FileNotFoundException? the user shouldnt know about these things
+			else if (exception.equals(FileNotFoundException.class)) throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
+			else throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
 			

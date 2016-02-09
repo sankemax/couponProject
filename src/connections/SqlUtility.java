@@ -13,51 +13,47 @@ import core.CouponSystemException;
 
 public class SqlUtility {
 
-	public static void rollbackConnection(Connection connection) {
+	public static void rollbackConnection(Connection connection) throws CouponSystemException {
 		try {
 			
 			if (connection != null) connection.rollback();
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}
 	}
 	
-	public static void closeStatement(Statement statement) {
+	public static void closeStatement(Statement statement) throws CouponSystemException {
 		
 		try {
 			
 			if (statement != null) statement.close();
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}
 	}
 	
-	public static void closeResultSet(ResultSet resultSet) {
+	public static void closeResultSet(ResultSet resultSet) throws CouponSystemException {
 		
 		try {
 			
 			if (resultSet != null) resultSet.close();
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}
 	}
 	
 	// in case the connection is not part of the connectionPool
-	public static void closeConnection(Connection connection) {
+	public static void closeConnection(Connection connection) throws CouponSystemException {
 		
 		try {
 			
 			if (connection != null) connection.close();
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}
 	}
 	
