@@ -72,11 +72,11 @@ public class TestTransactions {
 			company1.setPassword("4321");
 			company1.setEmail("gmail@Maxim.com");
 			admin.updateCompany(company1);
-			System.out.println("admin update (password & email) and get company1: " + admin.getCompany(company1.getId()));
+			System.out.println("admin updates company1 (password & email) and gets company1: " + admin.getCompany(company1.getId()));
 			try {
 				
 				admin.createCompany(company3);
-			} catch(CouponSystemException e) {				
+			} catch(CouponSystemException e) {
 				System.err.println("trying to create a company that already exists prints: "+e.getMessage());
 			}
 			
@@ -277,23 +277,62 @@ public class TestTransactions {
 			//get all purchased coupon by type
 			System.out.println(customer.getAllpurchasedCouponByType(CouponType.HEALTH));
 			
+			// get coupons by price by company facade:
+			try {
+				System.out.println("20");
+				System.out.println(company.getCouponByPrice(20));
+				System.out.println("36");
+				System.out.println(company.getCouponByPrice(36));
+				System.out.println("45");
+				System.out.println(company.getCouponByPrice(45));
+				System.out.println("5");
+				System.out.println(company.getCouponByPrice(5));
+			} catch(CouponSystemException e) {
+				System.err.println("when there are no coupons registered for the company under the specified amount: " + e.getMessage());
+			}
+
+			// get coupons by price by cusotmer facade:
+			try {
+				System.out.println("20");
+				System.out.println(customer.getAllpurchasedCouponByPrice(20));
+				System.out.println("36");
+				System.out.println(customer.getAllpurchasedCouponByPrice(36));
+				System.out.println("45");
+				System.out.println(customer.getAllpurchasedCouponByPrice(45));
+				System.out.println("5");
+				System.out.println(customer.getAllpurchasedCouponByPrice(5));
+			} catch(CouponSystemException e) {
+				System.err.println("when there are no coupons registered for the coupon under the specified amount: " + e.getMessage());
+			}
+
+			// get coupons by end-date by company:
+			try {
+				// a date after the creation of the coupons
+				System.out.println(new java.util.Date());
+				System.out.println(company.getCouponByDate(new java.util.Date()));
+				
+				// a date that preceeded the creation of the coupons (if they were created in this run):
+				System.out.println(new java.util.Date(new java.util.Date().getTime() - 990000000));
+				System.out.println(company.getCouponByDate(new java.util.Date(new java.util.Date().getTime() - 999999999)));
+			} catch(CouponSystemException e) {
+				System.err.println("when there are no coupons registered for the coupon under the specified amount: " + e.getMessage());
+			}
+			
 			//company remove coupon
 			company.removeCoupon(coupon1);
 			
 			//get all coupons After deletion
-			System.out.println(company.getAllCoupons());
+			System.out.println(company.getAllCoupons());			
 			
 			//admin remove company
 			admin.removeCompany(company1);
 			
-			//get all purchased coupons After deletion
+			// get all purchased coupons After deletion
 			try{
 				customer.getAllpurchasedCoupons();
 			}catch (CouponSystemException e){
 				System.err.println(e.getMessage());
 			}
-			
-			
 			
 			couponSystem.shutdown();
 
