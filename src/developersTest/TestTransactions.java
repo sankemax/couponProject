@@ -1,5 +1,6 @@
 package developersTest;
 
+import java.util.Calendar;
 import java.util.Date;
 import beans.Company;
 import beans.Coupon;
@@ -16,6 +17,9 @@ import facade.CustomerFacade;
 public class TestTransactions {
 
 	public static void main(String[] args) {
+		
+		Calendar cal = Calendar.getInstance();
+
 		try {
 			DbOperations.createDbAndTables();
 		} catch (CouponSystemException e1) {
@@ -136,84 +140,117 @@ public class TestTransactions {
 				System.err.println("trying to create a customer with an already existing name in the DB prints:" + e.getMessage());
 			}
 			
-			//Trying to get a customer that is not registered in the system:
+			// Trying to get a customer that is not registered in the system:
 			try {
 				admin.getCustomerByName("aaaa");
 			} catch (CouponSystemException e) {
 				System.err.println("Trying to get a customer that is not registered in the system prints: " + e.getMessage());
 			}
 			
-			//update customer
+			// updating customer password
 			customer1.setPassword("4321");
 			admin.updateCustomer(customer1);
 			System.out.println("admin updates customer1 password and gets customer1 by ID: " + admin.getCustomer(customer1.getId()));
 			
-			// TODO i've stopped here... continue next time
 			admin.createCustomer(customer3);
-			System.out.println("all customer");
-			System.out.println(admin.getAllCustomer());
+			System.out.println("list of all customers:");
+			System.out.println(admin.getAllCustomers());
 			
-			//remove customer
+			// remove a customer
+			System.out.println("removing customer " + customer3.getId() + ":");
 			admin.removeCustomer(customer3);
 			
-			System.out.println("all customer");
-			System.out.println(admin.getAllCustomer());
+			System.out.println("list of all customers after removal:");
+			System.out.println(admin.getAllCustomers());
 			
-		
-			
-			//company and his functions:
+			// company and his functions:
 			CompanyFacade company = (CompanyFacade) couponSystem.login("Maxim", "4321", ClientType.COMPANY);
 			
-			
-			//company logging in with wrong name
+			// company login in with a wrong name
 			try{
+				@SuppressWarnings("unused")
 				CompanyFacade companyTest = (CompanyFacade) couponSystem.login("Maxim", "12345", ClientType.COMPANY);
 			}catch (CouponSystemException e){
-				System.err.println(e.getMessage());
+				System.err.println("logging in with wrong username or password prints: " + e.getMessage());
 			}
 			
 			//coupons
-			Coupon coupon1 = new Coupon("clothes sale5", new Date(), new Date(new Date().getTime() + 1000*3600*24), 10, CouponType.SPORTS, "buy me please!", 30, "http://something.co");
-			Coupon coupon2 = new Coupon("armpit sale5", new Date(), new Date(new Date().getTime() + 1000*3600*24*2), 10, CouponType.HEALTH, "buy meeeeeeee", 35.5, "http://something.co");
-			Coupon coupon3 = new Coupon("retard clock5", new Date(), new Date(new Date().getTime() - 1000*3600*24*4), 10, CouponType.ELECTRICITY, "please!", 40, "http://something.co");
-			Coupon coupon4 = new Coupon("clothes for fat ppl5", new Date(), new Date(new Date().getTime() + 1000*3600*24*7), 0, CouponType.CLOTHES, "me", 45.5, "http://something.co");
+			Coupon coupon1 = new Coupon("clothes sale5", new Date(), new Date(cal.getTimeInMillis() + 1000*3600*24), 10, CouponType.SPORTS, "buy me please!", 30, "http://something.co");
+			Coupon coupon2 = new Coupon("armpit sale5", new Date(), new Date(cal.getTimeInMillis() + 1000*3600*24*2), 10, CouponType.HEALTH, "buy meeeeeeee", 35.5, "http://something.co");
+			Coupon coupon3 = new Coupon("retard clock5", new Date(), new Date(cal.getTimeInMillis() - 1000*3600*24*4), 10, CouponType.ELECTRICITY, "please!", 40, "http://something.co");
+			Coupon coupon4 = new Coupon("clothes for fat ppl5", new Date(), new Date(cal.getTimeInMillis() + 1000*3600*24*7), 1, CouponType.CLOTHES, "me", 45.5, "http://something.co");
 			
 			
-			//Trying to get coupons before created
+			// Trying to get all company coupons when there are none
 			try{
 				company.getAllCoupons();
 			}catch (CouponSystemException e){
-				System.err.println(e.getMessage());
+				System.err.println("Trying to get all company coupons when there are none, prints: " + e.getMessage());
 			}
 			
-			company.createCoupon(coupon1);
-			company.createCoupon(coupon2);
-			company.createCoupon(coupon3);
-			company.createCoupon(coupon4);
+			// creating coupons
+			try {
+				
+				// optional for testing purposes: remove coupons from system before creating them again
+				/**
+				 *  the next few rows are written to get the coupon ID into the coupon bean in order to correctly remove them
+				 */
+				coupon1.setCouponId(company.getCouponByTitle(coupon1.getTitle()).getId());
+//				coupon1.setCouponId(company.getCouponByTitle(coupon2.getTitle()).getId());
+//				coupon1.setCouponId(company.getCouponByTitle(coupon3.getTitle()).getId());
+//				coupon1.setCouponId(company.getCouponByTitle(coupon4.getTitle()).getId());
+				/**
+				 * 
+				 */
+				
+				// coupon removal for convenience of testing
+				company.removeCoupon(coupon1);
+//				company.removeCoupon(coupon2);
+//				company.removeCoupon(coupon3);
+//				company.removeCoupon(coupon4);
+				
+				// coupon creation
+				company.createCoupon(coupon1);
+				company.createCoupon(coupon2);
+				company.createCoupon(coupon3);
+				company.createCoupon(coupon4);
+				
+			} catch(CouponSystemException e) {
+				System.err.println("trying to create a coupon that already exists prints: " + e.getMessage());
+			}
 
-			//get coupon by title
-			System.out.println(company.getCouponByTitle(coupon1.getTitle()));
-			
-			//get coupons
-			System.out.println(company.getAllCoupons());
-			
-			//get coupon by price
-			System.out.println(company.getCouponByPrice(39));
-			
-			//get coupon by type
-			System.out.println(company.getCouponByType(CouponType.HEALTH));
-			
+			// get coupon queries:
+			try {
+				
+				// get coupon by title
+				System.out.println(company.getCouponByTitle(coupon1.getTitle()));
+				
+				// get all coupons
+				System.out.println(company.getAllCoupons());
+				
+				//get coupon by price
+				System.out.println(company.getCouponByPrice(39));
+				
+				//get coupon by type
+				System.out.println(company.getCouponByType(CouponType.HEALTH));
+
+				//get coupon by date
+				System.out.println(company.getCouponByDate(new java.util.Date()));
+				
+			} catch(CouponSystemException e) {				
+				System.err.println("trying to get coupons that don't exist, prints: " + e.getMessage());
+			}
 			
 			//Trying to create a coupon with the same name
 			try{
 				company.createCoupon(coupon1);
 			}catch (CouponSystemException e){
-				System.err.println(e.getMessage());
+				System.err.println("Trying to create a coupon which already exists / with the same name" + e.getMessage());
 			}
 			
-			
+			// TODO i've stopped here... continue next time
 			//update coupon
-			coupon1.setEndDate(new Date(new Date().getTime() + 1000*3600*24*3));
+			coupon1.setEndDate(new Date(cal.getTimeInMillis() + 1000*3600*24*3));
 			coupon1.setPrice(20);
 			company.updateCoupon(coupon1);
 			System.out.println(company.getCoupon(coupon1.getId()));
@@ -279,43 +316,43 @@ public class TestTransactions {
 			
 			// get coupons by price by company facade:
 			try {
-				System.out.println("20");
+				System.out.println("20:");
 				System.out.println(company.getCouponByPrice(20));
-				System.out.println("36");
+				System.out.println("36:");
 				System.out.println(company.getCouponByPrice(36));
-				System.out.println("45");
-				System.out.println(company.getCouponByPrice(45));
-				System.out.println("5");
+				System.out.println("47:");
+				System.out.println(company.getCouponByPrice(47));
+				System.out.println("5:");
 				System.out.println(company.getCouponByPrice(5));
 			} catch(CouponSystemException e) {
-				System.err.println("when there are no coupons registered for the company under the specified amount: " + e.getMessage());
+				System.err.println("when there are no coupons registered for the COMPANY under the specified amount, it prints: " + e.getMessage());
 			}
 
 			// get coupons by price by cusotmer facade:
 			try {
-				System.out.println("20");
+				System.out.println("20:");
 				System.out.println(customer.getAllpurchasedCouponByPrice(20));
-				System.out.println("36");
+				System.out.println("36:");
 				System.out.println(customer.getAllpurchasedCouponByPrice(36));
-				System.out.println("45");
-				System.out.println(customer.getAllpurchasedCouponByPrice(45));
-				System.out.println("5");
+				System.out.println("47:");
+				System.out.println(customer.getAllpurchasedCouponByPrice(47));
+				System.out.println("5:");
 				System.out.println(customer.getAllpurchasedCouponByPrice(5));
 			} catch(CouponSystemException e) {
-				System.err.println("when there are no coupons registered for the coupon under the specified amount: " + e.getMessage());
+				System.err.println("when there are no coupons registered for the CUSTOMER under the specified amount, it prints: " + e.getMessage());
 			}
 
 			// get coupons by end-date by company:
 			try {
 				// a date after the creation of the coupons
-				System.out.println(new java.util.Date());
+				System.out.println("coupons that are valid till: " + new java.util.Date());
 				System.out.println(company.getCouponByDate(new java.util.Date()));
 				
 				// a date that preceeded the creation of the coupons (if they were created in this run):
-				System.out.println(new java.util.Date(new java.util.Date().getTime() - 990000000));
-				System.out.println(company.getCouponByDate(new java.util.Date(new java.util.Date().getTime() - 999999999)));
+				System.out.println("coupons that are valid till: " + new java.util.Date(cal.getTimeInMillis() - 990000000));
+				System.out.println(company.getCouponByDate(new java.util.Date(cal.getTimeInMillis() - 999999999)));
 			} catch(CouponSystemException e) {
-				System.err.println("when there are no coupons registered for the coupon under the specified amount: " + e.getMessage());
+				System.err.println("when there are no coupons registered for the coupon under the specified amount, it prints: " + e.getMessage());
 			}
 			
 			//company remove coupon

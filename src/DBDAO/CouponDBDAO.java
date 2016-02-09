@@ -34,8 +34,8 @@ public class CouponDBDAO implements CouponDAO {
 			sql = "INSERT INTO coupon(title, start_date, end_date, amount, coupon_type, message, price, image) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 			preparedSt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			preparedSt.setString(1, coupon.getTitle());
-			preparedSt.setDate(2, new java.sql.Date(coupon.getStartDate().getTime()));
-			preparedSt.setDate(3, new java.sql.Date(coupon.getEndDate().getTime()));
+			preparedSt.setTimestamp(2, new java.sql.Timestamp(coupon.getStartDate().getTime()));
+			preparedSt.setTimestamp(3, new java.sql.Timestamp(coupon.getEndDate().getTime()));
 			preparedSt.setInt(4, coupon.getAmount());
 			preparedSt.setString(5, coupon.getType().toString());
 			preparedSt.setString(6, coupon.getMessage());
@@ -195,8 +195,8 @@ public class CouponDBDAO implements CouponDAO {
 			if (result.next()) {
 				
 				coupon = new Coupon(result.getString(2), 
-						new java.util.Date(result.getDate(3).getTime()), 
-						new java.util.Date(result.getDate(4).getTime()), 
+						new java.util.Date(result.getTimestamp(3).getTime()), 
+						new java.util.Date(result.getTimestamp(4).getTime()), 
 						result.getInt(5), 
 						CouponType.valueOf(result.getString(6)), 
 						result.getString(7), 
@@ -373,8 +373,8 @@ public class CouponDBDAO implements CouponDAO {
 			if (result.next()) {
 				
 				coupon = new Coupon(result.getString(2), 
-						new java.util.Date(result.getDate(3).getTime()), 
-						new java.util.Date(result.getDate(4).getTime()), 
+						new java.util.Date(result.getTimestamp(3).getTime()), 
+						new java.util.Date(result.getTimestamp(4).getTime()), 
 						result.getInt(5), 
 						CouponType.valueOf(result.getString(6)), 
 						result.getString(7), 

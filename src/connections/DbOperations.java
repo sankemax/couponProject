@@ -60,10 +60,10 @@ public class DbOperations {
 			
 		} catch (SQLException | ClassNotFoundException | FileNotFoundException e) {
 			
-			Class<? extends Exception> exception = e.getClass();
-			if (exception.equals(SQLException.class)) SqlUtility.rollbackConnection(connection);
+			Class<? extends Exception> exceptionClass = e.getClass();
+			if (exceptionClass.equals(SQLException.class)) SqlUtility.rollbackConnection(connection);
 			// TODO should we create a new exception for FileNotFoundException? the user shouldnt know about these things
-			else if (exception.equals(FileNotFoundException.class)) throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
+			else if (exceptionClass.equals(FileNotFoundException.class)) throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			else throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
