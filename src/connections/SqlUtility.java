@@ -64,8 +64,8 @@ public class SqlUtility {
 			if(resultSet.next()){
 				do{
 					Coupon coupon = new Coupon(resultSet.getString(2), 
-							new java.util.Date(resultSet.getDate(3).getTime()), 
-							new java.util.Date(resultSet.getDate(4).getTime()),
+							new java.util.Date(resultSet.getTimestamp(3).getTime()), 
+							new java.util.Date(resultSet.getTimestamp(4).getTime()),
 							resultSet.getInt(5),
 							CouponType.valueOf(resultSet.getString(6)),
 							resultSet.getString(7),
