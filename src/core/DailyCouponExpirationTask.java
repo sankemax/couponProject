@@ -47,7 +47,7 @@ public class DailyCouponExpirationTask implements Runnable {
 			} catch (InterruptedException e) {
 				quit = true;
 			} catch (CouponSystemException e) {
-				// TODO what should we do?
+				System.err.println("system error in the DailyExpirationTask");
 			}
 		}
 	}
