@@ -3,10 +3,11 @@ package facade;
 
 import java.util.Date;
 import java.util.List;
-import DAO.*;
-import DBDAO.*;
-import beans.*;
+
 import core.CouponSystemException;
+import core.beans.*;
+import dao.*;
+import dao.dbdao.*;
 
 
 public class CompanyFacade implements CouponClientFacade {
@@ -41,6 +42,10 @@ public class CompanyFacade implements CouponClientFacade {
 	
 	public Coupon getCoupon(long id) throws CouponSystemException {
 		return couponDAO.getCoupon(id);
+	}
+
+	public Company getThisCompany() throws CouponSystemException {
+		return company;
 	}
 
 	public Coupon getCouponByTitle(String title) throws CouponSystemException {

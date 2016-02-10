@@ -1,10 +1,9 @@
-package DAO;
+package dao;
 
 import java.util.List;
 
-
-import beans.Customer;
 import core.CouponSystemException;
+import core.beans.Customer;
 
 public interface CustomerDAO {
 	public void createCustomer(Customer customer) throws CouponSystemException;

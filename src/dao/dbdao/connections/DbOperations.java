@@ -1,4 +1,4 @@
-package connections;
+package dao.dbdao.connections;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -60,7 +60,11 @@ public class DbOperations {
 			
 		} catch (SQLException | ClassNotFoundException | FileNotFoundException e) {
 			
-			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
+			Class<? extends Exception> exceptionClass = e.getClass();
+			if (exceptionClass.equals(SQLException.class)) SqlUtility.rollbackConnection(connection);
+			// TODO should we create a new exception for FileNotFoundException? the user shouldnt know about these things
+			else if (exceptionClass.equals(FileNotFoundException.class)) throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
+			else throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 			
 		} finally {
 			

@@ -1,4 +1,4 @@
-package DBDAO;
+package dao.dbdao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,11 +7,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import DAO.CustomerDAO;
-import beans.Customer;
-import connections.ConnectionPool;
-import connections.SqlUtility;
+
 import core.CouponSystemException;
+import core.beans.Customer;
+import dao.CustomerDAO;
+import dao.dbdao.connections.ConnectionPool;
+import dao.dbdao.connections.SqlUtility;
 
 public class CustomerDBDAO implements CustomerDAO {
 	

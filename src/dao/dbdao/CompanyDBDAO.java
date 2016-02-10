@@ -1,13 +1,14 @@
-package DBDAO;
+package dao.dbdao;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import DAO.CompanyDAO;
-import beans.Company;
-import connections.ConnectionPool;
-import connections.SqlUtility;
+
 import core.CouponSystemException;
+import core.beans.Company;
+import dao.CompanyDAO;
+import dao.dbdao.connections.ConnectionPool;
+import dao.dbdao.connections.SqlUtility;
 
 public class CompanyDBDAO implements CompanyDAO {
 	ConnectionPool connectionPool;

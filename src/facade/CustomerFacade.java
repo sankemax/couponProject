@@ -4,10 +4,11 @@ package facade;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import DAO.*;
-import DBDAO.*;
-import beans.*;
+
 import core.CouponSystemException;
+import core.beans.*;
+import dao.*;
+import dao.dbdao.*;
 
 
 public class CustomerFacade implements CouponClientFacade {

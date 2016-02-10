@@ -1,20 +1,11 @@
 package developersTest;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import beans.Company;
-import beans.Coupon;
-import beans.CouponType;
-import beans.Customer;
-import connections.DbOperations;
-import core.ClientType;
-import core.CouponSystem;
-import core.CouponSystemException;
-import facade.AdminFacade;
-import facade.CompanyFacade;
-import facade.CustomerFacade;
+import core.*;
+import core.beans.*;
+import dao.dbdao.connections.DbOperations;
+import facade.*;
 
 public class TestTransactions {
 
