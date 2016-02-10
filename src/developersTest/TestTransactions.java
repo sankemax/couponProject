@@ -1,20 +1,11 @@
 package developersTest;
-
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import core.ClientType;
-import core.CouponSystem;
-import core.CouponSystemException;
-import core.beans.Company;
-import core.beans.Coupon;
-import core.beans.CouponType;
-import core.beans.Customer;
+import core.*;
+import core.beans.*;
 import dao.dbdao.connections.DbOperations;
-import facade.AdminFacade;
-import facade.CompanyFacade;
-import facade.CustomerFacade;
+import facade.*;
 
 public class TestTransactions {
 
@@ -284,7 +275,7 @@ public class TestTransactions {
 			
 				
 			// in case the information of the coupon was changed during the developers test (ID and/or name) and the bean no longer
-			// corresponds to the actual information in the DB we refresh the core.beans:
+			// corresponds to the actual information in the DB we refresh the beans:
 			try {
 				
 				List<Coupon> list = company.getAllCoupons();
@@ -396,7 +387,7 @@ public class TestTransactions {
 			couponSystem.shutdown();
 
 		} catch (CouponSystemException e) {
-			System.out.println(e.getMessage());
+			System.err.println(e.getMessage());
 		}
 	}
 }
