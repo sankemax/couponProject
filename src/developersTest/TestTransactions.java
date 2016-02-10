@@ -26,7 +26,7 @@ public class TestTransactions {
 			
 			//admin and his functions:
 			AdminFacade admin = (AdminFacade) couponSystem.login("ADMIN", "1234", ClientType.ADMIN);
-			System.err.println("admin is logged in. (printed as an error for visual convenience to represent a correct flow of events)");
+			System.out.println("admin is logged in");
 			
 			//companies
 			Company company1 = new Company("Maxim","1234","maxim1@gmail.com");
@@ -173,6 +173,8 @@ public class TestTransactions {
 			Coupon coupon3 = new Coupon("clock5", new Date(), new Date(cal.getTimeInMillis() - 1000*3600*24*4), 10, CouponType.ELECTRICITY, "please!", 40, "http://something.co");
 			Coupon coupon4 = new Coupon("fat cat for ppl5", new Date(), new Date(cal.getTimeInMillis() + 1000*3600*24*7), 0, CouponType.CLOTHES, "me", 45.5, "http://something.co");
 			
+			// getting the details of the company:
+			System.out.println("the details of the company:\n" + company.getThisCompany());
 			
 			// Trying to get all company coupons when there are none
 			try{

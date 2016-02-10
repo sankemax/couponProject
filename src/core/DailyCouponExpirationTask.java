@@ -21,11 +21,7 @@ public class DailyCouponExpirationTask implements Runnable {
 	}
 	
 	@Override
-	public void run() {
-		
-		if(Thread.currentThread().getState().toString().equals("NEW")) {
-			Thread.currentThread().setDaemon(true);		
-		}
+	public void run() {	
 		
 		while (! quit) {
 			try {
@@ -43,11 +39,18 @@ public class DailyCouponExpirationTask implements Runnable {
 					}
 				}
 				
-					Thread.sleep(MILLI_SEC_IN_DAY);
-			} catch (InterruptedException e) {
-				quit = true;
 			} catch (CouponSystemException e) {
-				System.err.println("system error in the DailyExpirationTask");
+				// it is natural for the DB to have no coupons at certain points 
+				if(! e.getMessage().equals(CouponSystemException.COUPONS_NOT_EXIST)) {					
+					System.err.println("system error in the DailyExpirationTask" + e.getMessage());
+				}
+			} finally {
+				try {
+					// even if there's no coupons in the DB, the thread should sleep for the determined amount of time
+					Thread.sleep(MILLI_SEC_IN_DAY);
+				} catch (InterruptedException e) {
+					quit = true;
+				}
 			}
 		}
 	}
