@@ -1,6 +1,6 @@
 package core;
 
-import connections.ConnectionPool;
+import dao.dbdao.connections.ConnectionPool;
 import facade.AdminFacade;
 import facade.CompanyFacade;
 import facade.CouponClientFacade;

@@ -1,4 +1,4 @@
-package connections;
+package dao.dbdao.connections;
 
 
 import java.sql.*;
@@ -31,7 +31,7 @@ public class ConnectionPool {
 			throw new CouponSystemException(CouponSystemException.SYSTEM_ERROR);
 		}
 		
-		// populating connection pool with active connections
+		// populating connection pool with active dao.dbdao.connections
 		for (int i = 0; i < 10; i++) {
 			
 			try {
@@ -42,7 +42,7 @@ public class ConnectionPool {
 		}
 	}
 	
-	// getter of the singleton instance ConnectionPool which holds 10 connections
+	// getter of the singleton instance ConnectionPool which holds 10 dao.dbdao.connections
 	public static ConnectionPool getInstance() throws CouponSystemException {
 		if (instance == null) {
 			instance = new ConnectionPool();
@@ -56,7 +56,7 @@ public class ConnectionPool {
 			
 			try {
 				
-				// if no connections available, wait till a connection returns to the pool
+				// if no dao.dbdao.connections available, wait till a connection returns to the pool
 				this.wait();
 			} catch (InterruptedException e) {
 				System.out.println("Interrupted");
@@ -80,7 +80,7 @@ public class ConnectionPool {
 		this.notify();
 	}
 	
-	// a method that closes all connections. in case the connections are being used
+	// a method that closes all dao.dbdao.connections. in case the dao.dbdao.connections are being used
 	// it will wait till the moment they are freed
 	public synchronized void closeAllConnections() throws CouponSystemException {
 		

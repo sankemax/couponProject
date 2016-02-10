@@ -2,13 +2,13 @@ package facade;
 
 import java.util.List;
 
-import DAO.CompanyDAO;
-import DAO.CustomerDAO;
-import DBDAO.CompanyDBDAO;
-import DBDAO.CustomerDBDAO;
-import beans.Company;
-import beans.Customer;
 import core.CouponSystemException;
+import core.beans.Company;
+import core.beans.Customer;
+import dao.CompanyDAO;
+import dao.CustomerDAO;
+import dao.dbdao.CompanyDBDAO;
+import dao.dbdao.CustomerDBDAO;
 
 public class AdminFacade implements CouponClientFacade{
 	

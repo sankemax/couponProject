@@ -1,4 +1,4 @@
-package connections;
+package dao.dbdao.connections;
 
 import java.io.File;
 import java.io.FileNotFoundException;

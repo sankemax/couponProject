@@ -1,9 +1,10 @@
-package DAO;
+package dao;
 
 
 import java.util.List;
-import beans.Company;
+
 import core.CouponSystemException;
+import core.beans.Company;
 
 
 public interface CompanyDAO {

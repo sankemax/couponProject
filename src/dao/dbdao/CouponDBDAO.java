@@ -1,14 +1,15 @@
-package DBDAO;
+package dao.dbdao;
 
 import java.sql.*;
 import java.util.Date;
 import java.util.List;
-import DAO.CouponDAO;
-import beans.Coupon;
-import beans.CouponType;
-import connections.ConnectionPool;
-import connections.SqlUtility;
+
 import core.CouponSystemException;
+import core.beans.Coupon;
+import core.beans.CouponType;
+import dao.CouponDAO;
+import dao.dbdao.connections.ConnectionPool;
+import dao.dbdao.connections.SqlUtility;
 
 public class CouponDBDAO implements CouponDAO {
 

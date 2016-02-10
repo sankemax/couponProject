@@ -4,9 +4,9 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 
-import DAO.CouponDAO;
-import DBDAO.CouponDBDAO;
-import beans.Coupon;
+import core.beans.Coupon;
+import dao.CouponDAO;
+import dao.dbdao.CouponDBDAO;
 
 public class DailyCouponExpirationTask implements Runnable {
 	

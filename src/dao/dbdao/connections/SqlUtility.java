@@ -1,4 +1,4 @@
-package connections;
+package dao.dbdao.connections;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -7,9 +7,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import beans.Coupon;
-import beans.CouponType;
 import core.CouponSystemException;
+import core.beans.Coupon;
+import core.beans.CouponType;
 
 public class SqlUtility {
 
