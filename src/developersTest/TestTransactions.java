@@ -396,7 +396,7 @@ public class TestTransactions {
 			couponSystem.shutdown();
 
 		} catch (CouponSystemException e) {
-			e.printStackTrace();
+			System.err.println(e.getMessage());
 		}
 	}
 }
