@@ -67,7 +67,7 @@ public class DbOperations {
 			// create SQL commands for each table separately
 			String[] statements = sql.split(";");
 			
-			// execute the commands to create each table. the loop is as big as the number of tables to create
+			// execute the commands to create each table. the loop is as big as the number of tables.
 			for (int i = 0; i < statements.length; i++ ) {
 								
 				// if the table already exists in the DB, the resultSet will be empty
