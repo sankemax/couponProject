@@ -1,0 +1,7 @@
+core
+core.beans
+dao
+dao.dbdao
+dao.dbdao.connections
+developersTest
+facade

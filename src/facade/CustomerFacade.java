@@ -27,17 +27,21 @@ public class CustomerFacade implements CouponClientFacade {
 		// the next row is for demonstration of the first step in the project only:
 		coupon.setCouponId(couponDAO.getCouponByTitle(coupon.getTitle()).getId());
 		
-		if(customerDAO.isPurchased(customer.getId(), coupon.getId())) {
+		if (!couponDAO.isTitleExists(coupon.getTitle())) {
+			throw new CouponSystemException(CouponSystemException.COUPON_NOT_EXIST_ERROR);
+		}
+		
+		if (customerDAO.isPurchased(customer.getId(), coupon.getId())) {
 			throw new CouponSystemException(CouponSystemException.COUPON_ALREADY_PURCHASED);
 		}
 		
-		if(couponDAO.getCoupon(coupon.getId()).getAmount() <= 0) {
+		if (couponDAO.getCoupon(coupon.getId()).getAmount() <= 0) {
 			throw new CouponSystemException(CouponSystemException.COUPON_OUT_OF_STOCK);
 		}
 		
 		Calendar calendar = Calendar.getInstance();
 		Date today = calendar.getTime();
-		if(couponDAO.getCoupon(coupon.getId()).getEndDate().before(today)) {
+		if (couponDAO.getCoupon(coupon.getId()).getEndDate().before(today)) {
 			throw new CouponSystemException(CouponSystemException.COUPON_EXPIRATION_DATE_PASSED);			
 		}
 		customerDAO.purchaseCoupon(customer.getId(), coupon.getId());

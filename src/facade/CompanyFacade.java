@@ -24,6 +24,8 @@ public class CompanyFacade implements CouponClientFacade {
 	}
 	
 	public void createCoupon(Coupon coupon) throws CouponSystemException {
+
+		// we lowercase all title names of the coupons for normalization purposes
 		coupon.setTitle(coupon.getTitle().toLowerCase());
 		
 		if(couponDAO.isTitleExists(coupon.getTitle())) {
