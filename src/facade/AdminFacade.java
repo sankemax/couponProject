@@ -21,6 +21,8 @@ public class AdminFacade implements CouponClientFacade{
 	}
 	
 	public void createCompany(Company company) throws CouponSystemException{
+		
+		// we lowercase all the names of companies for normalization purposes
 		company.setCompName(company.getCompName().toLowerCase());
 		
 		if (companyDAO.isNameExists(company.getCompName())){

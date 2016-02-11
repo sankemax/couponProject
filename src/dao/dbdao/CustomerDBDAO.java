@@ -214,7 +214,7 @@ public class CustomerDBDAO implements CustomerDAO {
 	public boolean isPurchased(long customerId, long couponId) throws CouponSystemException {
 		
 		Connection connection = pool.getConnection();
-		String sql = "SELECT * FROM Customer_Coupon WHERE CUST_ID = ? AND COUPON_ID = ? FETCH FIRST ROW ONLY";
+		String sql = "SELECT * FROM customer_coupon WHERE cust_id = ? AND coupon_id = ? FETCH FIRST ROW ONLY";
 		ResultSet rs = null;
 			
 		try(PreparedStatement ps = connection.prepareStatement(sql);){
@@ -238,7 +238,7 @@ public class CustomerDBDAO implements CustomerDAO {
 	public void purchaseCoupon(long customerId, long couponId) throws CouponSystemException {
 		Connection connection = pool.getConnection();
 		
-		String sql1 = "INSERT INTO customer_coupon (CUST_ID, COUPON_ID) VALUES(?,?)";
+		String sql1 = "INSERT INTO customer_coupon (cust_id, coupon_id) VALUES(?,?)";
 		String sql2 = "UPDATE coupon SET amount = amount - 1 WHERE id = " + couponId;
 		
 		try (PreparedStatement ps = connection.prepareStatement(sql1); 
