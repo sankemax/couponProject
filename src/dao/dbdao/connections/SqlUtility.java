@@ -13,6 +13,10 @@ import core.beans.CouponType;
 
 public class SqlUtility {
 
+	/**Rolls back the uncommitted changes that were made in the DB.
+	 * @param connection the connection that was used to communicate with the DB.
+	 * @throws CouponSystemException if the rollback isn't successful.
+	 */
 	public static void rollbackConnection(Connection connection) throws CouponSystemException {
 		try {
 			
@@ -23,6 +27,10 @@ public class SqlUtility {
 		}
 	}
 	
+	/** Closes a statement that was created by some result set.
+	 * @param statement the statement which is to be closed.
+	 * @throws CouponSystemException if the closure isn't successful.
+	 */
 	public static void closeStatement(Statement statement) throws CouponSystemException {
 		
 		try {
@@ -34,6 +42,10 @@ public class SqlUtility {
 		}
 	}
 	
+	/**Closes a result set that was created by some statement.
+	 * @param resultSet the result set which is to be closed.
+	 * @throws CouponSystemException if the closure isn't successful.
+	 */
 	public static void closeResultSet(ResultSet resultSet) throws CouponSystemException {
 		
 		try {
@@ -45,7 +57,10 @@ public class SqlUtility {
 		}
 	}
 	
-	// in case the connection is not part of the connectionPool
+	/**Closes a connection <b>use this method in case the connection is not part of the connection pool</b>.
+	 * @param connection the connection which is to be closed.
+	 * @throws CouponSystemException if the closure isn't successful.
+	 */
 	public static void closeConnection(Connection connection) throws CouponSystemException {
 		
 		try {
@@ -57,6 +72,12 @@ public class SqlUtility {
 		}
 	}
 	
+	/**
+	 * Creates a list of coupons from a given result set. Used for minimizing of duplicated code.
+	 * @param resultSet the result set that stores the coupons that were extracted from the DB.
+	 * @return a list of coupons.
+	 * @throws CouponSystemException if there are no coupons in the result set or if encountered IO failure.
+	 */
 	public static List<Coupon> createCoupons(ResultSet resultSet) throws CouponSystemException{
 		List<Coupon> couponList = new ArrayList<Coupon>();
 		
