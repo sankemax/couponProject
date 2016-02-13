@@ -40,16 +40,30 @@ public class DailyCouponExpirationTask implements Runnable {
 				}
 				
 			} catch (CouponSystemException e) {
-				// it is natural for the DB to have no coupons at certain points 
+				
+				// it is natural for the DB to have no coupons at certain points,
+				// so we exclude this exception from the problematic ones
 				if(! e.getMessage().equals(CouponSystemException.COUPONS_NOT_EXIST)) {					
-					System.err.println("system error in the DailyExpirationTask" + e.getMessage());
+					System.err.println("system error in the DailyExpirationTask: " + e.getMessage());
 				}
 			} finally {
 				try {
+					
 					// even if there's no coupons in the DB, the thread should sleep for the determined amount of time
 					Thread.sleep(MILLI_SEC_IN_DAY);
 				} catch (InterruptedException e) {
-					quit = true;
+					
+					/* 
+					 * if the thread was interrupted by shutdown() method from CouponSystem, the value of quit was already
+					 * changed to "true", so the thread will terminate. otherwise, there's no apparent logical reason for
+					 * the interrupt and it may well be that the system is still functional. in that case, the thread
+					 *  should continue running as normal.
+					 */
+					if (!quit) {
+						System.err.println("sleep interrupted, but not through shutdown() method from CouponSystem."
+								+ " proceeding as normal");
+					}
+						
 				}
 			}
 		}

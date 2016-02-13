@@ -386,7 +386,7 @@ public class TestTransactions {
 				System.err.println("when a customer has no purchased coupons, it prints: " + e.getMessage());
 			}
 			
-			System.out.println("system shutting down:");
+			System.out.println("system shutting down...");
 			couponSystem.shutdown();
 
 		} catch (CouponSystemException e) {
