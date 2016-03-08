@@ -19,21 +19,8 @@ public class CouponSystemException extends Exception {
 	public static final String CUSTOMERS_NOT_EXIST  = "no relevant customers for that query";
 	public static final String COMPANIES_NOT_EXIST  = "no relevant companies for that query";
 	public static final String COUPONS_NOT_EXIST  = "no relevant coupons for that query";
-	
-	private int errorNumber;
 
-	
 	public CouponSystemException(String message){
 		super(message);
-		setErrorNumber(510);
 	}
-	
-	public int getErrorNumber() {
-		return errorNumber;
-	}
-
-	public void setErrorNumber(int errorNumber) {
-		this.errorNumber = errorNumber;
-	}
-	
 }
